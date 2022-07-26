@@ -11,10 +11,14 @@ class Link:
     return self.transformation_matrix
 
 
-class DirectKinematic:
+class ForwardKinematic:
   def __init__(self, links):
     self.links = links
     self.len_links = len(self.links)
+
+    self.transformations_from_zero_to_i = [
+      self.get_transformation(0, i) for i in range(1, self.len_links + 1)
+    ]
 
     self.htm = self.get_homogeneous_transformation_matrix()
     self.jacobian = self.get_jacobian()
