@@ -3,11 +3,12 @@ from lib.constants import g, t
 
 
 class ForwardDynamics:
-  def __init__(self, links):
-    self.links = links
+  def __init__(self, forward_kinematics):
+    self.transformations = forward_kinematics.transformations_from_zero_to_i
+    self.theta_functions = forward_kinematics.theta_functions
 
     total_lagrangian = 0
-    for i in range(len(links)):
+    for i in range(len(self.transformations)):
       total_lagrangian += self.get_link_lagrangian(i)
 
     self.total_lagrangian = total_lagrangian
@@ -16,8 +17,8 @@ class ForwardDynamics:
   def get_system_equations_of_motion(self):
     equations = []
 
-    for i in range(len(self.links)):
-      theta = self.links[i].dhp[0]
+    for i in range(len(self.transformations)):
+      theta = self.theta_functions[i]
       tau_i = sp.Symbol(f'tau_{i + 1}')
 
       eq = sp.Eq(
@@ -34,17 +35,17 @@ class ForwardDynamics:
     m = sp.Symbol(f'm_{link_index}')
 
     v_x = sp.diff(
-      self.links[link_index].get_transformation_matrix()[0, 3],
+      self.transformations[link_index][0, 3],
       t
     )
 
     v_y = sp.diff(
-      self.links[link_index].get_transformation_matrix()[1, 3],
+      self.transformations[link_index][1, 3],
       t
     )
 
     v_z = sp.diff(
-      self.links[link_index].get_transformation_matrix()[2, 3],
+      self.transformations[link_index][2, 3],
       t
     )
 
@@ -53,7 +54,7 @@ class ForwardDynamics:
   def get_link_potential_energy(self, link_index):
     # Potential energy of link i = m_i * g * y_i
     m = sp.Symbol(f'm_{link_index}')
-    return m * g * self.links[link_index].get_transformation_matrix()[2, 3]
+    return m * g * self.transformations[link_index][1, 3]
 
   def get_link_lagrangian(self, link_index):
     return self.get_link_kinetic_energy(link_index) - self.get_link_potential_energy(link_index)

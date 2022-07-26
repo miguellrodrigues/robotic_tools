@@ -16,6 +16,10 @@ class ForwardKinematic:
     self.links = links
     self.len_links = len(self.links)
 
+    self.theta_functions = [
+      self.links[i].dhp[0] for i in range(self.len_links)
+    ]
+
     self.transformations_from_zero_to_i = [
       self.get_transformation(0, i) for i in range(1, self.len_links + 1)
     ]
