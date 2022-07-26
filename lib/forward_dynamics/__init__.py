@@ -1,5 +1,5 @@
 import sympy as sp
-from lib.constants import g, t
+from lib.symbols import g, t
 
 
 class ForwardDynamics:
