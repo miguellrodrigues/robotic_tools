@@ -20,5 +20,5 @@ def compute_homogeneous_transformation(links, start, end):
 	for i in range(start + 1, end):
 		transformation_matrix_i = links[i].get_transformation_matrix()
 		transformation_matrix = transformation_matrix @ transformation_matrix_i
-	
+
 	return transformation_matrix

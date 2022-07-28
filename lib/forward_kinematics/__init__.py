@@ -3,8 +3,13 @@ from lib.utils import compute_link_transformation, compute_homogeneous_transform
 
 
 class Link:
-  def __init__(self, dhp):
+  def __init__(self, dhp, generalized_coordinate=None):
     self.dhp = dhp
+    self.generalized_coordinate = generalized_coordinate
+
+    if generalized_coordinate is None:
+      self.generalized_coordinate = dhp[0]
+
     self.transformation_matrix = compute_link_transformation(dhp)
 
   def get_transformation_matrix(self):
@@ -16,15 +21,16 @@ class ForwardKinematic:
     self.links = links
     self.len_links = len(self.links)
 
-    self.theta_functions = [
-      self.links[i].dhp[0] for i in range(self.len_links)
+    self.generalized_coordinates = [
+      self.links[i].generalized_coordinate for i in range(self.len_links)
     ]
 
     self.transformations_from_zero_to_i = [
       self.get_transformation(0, i) for i in range(1, self.len_links + 1)
     ]
 
-    self.htm = self.get_homogeneous_transformation_matrix()
+    self.homogeneous_transformation_matrix = self.get_transformation(0, self.len_links)
+
     self.jacobian = self.get_jacobian()
 
   def get_transformation(self, start, end):
@@ -32,7 +38,7 @@ class ForwardKinematic:
     return tf
 
   def get_homogeneous_transformation_matrix(self):
-    return compute_homogeneous_transformation(self.links, 0, len(self.links))
+    return self.homogeneous_transformation_matrix
 
   def get_spacial_jacobian(self):
     return self.jacobian[:3, :]
@@ -41,7 +47,7 @@ class ForwardKinematic:
     return self.jacobian[3:, :]
 
   def get_jacobian(self):
-    htm = self.get_homogeneous_transformation_matrix()
+    htm = self.homogeneous_transformation_matrix
 
     j = sp.zeros(6, self.len_links)
 

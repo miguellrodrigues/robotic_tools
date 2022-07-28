@@ -1,22 +1,24 @@
-from lib.forward_kinematics import Link, ForwardKinematic
 import sympy as sp
+
 from lib.forward_dynamics import ForwardDynamics
+from lib.forward_kinematics import Link, ForwardKinematic
 from lib.symbols import t
 
-l2, l3, l4, l5, d3 = sp.symbols('l2 l3 l4 l5 d3')
+l1, l2 = sp.symbols('l1 l2')
 
 theta1 = sp.Function('theta_1')(t)
 theta2 = sp.Function('theta_2')(t)
-theta3 = sp.Function('theta_3')(t)
-theta4 = sp.Function('theta_4')(t)
 
-j0 = Link([theta1, 0, l2, 0])
-j1 = Link([theta2, 0, l3, 0])
+j0 = Link([theta1, 0, l1, 0])
+j1 = Link([theta2, 0, l2, 0])
 
 fk = ForwardKinematic([j0, j1])
 fd = ForwardDynamics(fk)
 
+print(' ')
+sp.print_latex(sp.simplify(fk.get_homogeneous_transformation_matrix()))
+print(' ')
 for eq in fd.equations:
-  sp.print_latex(eq.simplify())
+  sp.print_latex(eq.expand())
   print(' ')
-
+print(' ')
