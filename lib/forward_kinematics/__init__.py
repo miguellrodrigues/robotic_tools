@@ -1,19 +1,7 @@
 import sympy as sp
-from lib.utils import compute_link_transformation, compute_homogeneous_transformation
 
-
-class Link:
-  def __init__(self, dhp, generalized_coordinate=None):
-    self.dhp = dhp
-    self.generalized_coordinate = generalized_coordinate
-
-    if generalized_coordinate is None:
-      self.generalized_coordinate = dhp[0]
-
-    self.transformation_matrix = compute_link_transformation(dhp)
-
-  def get_transformation_matrix(self):
-    return self.transformation_matrix
+from lib.link import Link
+from lib.utils import compute_homogeneous_transformation
 
 
 class ForwardKinematic:
@@ -21,16 +9,20 @@ class ForwardKinematic:
     self.links = links
     self.len_links = len(self.links)
 
-    self.generalized_coordinates = [
-      self.links[i].generalized_coordinate for i in range(self.len_links)
-    ]
+    self.links_zero_i = []
 
-    self.transformations_from_zero_to_i = [
-      self.get_transformation(0, i) for i in range(1, self.len_links + 1)
-    ]
+    for i in range(1, self.len_links + 1):
+      self.links_zero_i.append(
+        Link(
+          generalized_coordinate=self.links[i - 1].dhp[0],
+          link_type=self.links[i - 1].link_type,
+          inertia_moment=sp.Symbol(f'J_{i}'),
+          mass=sp.Symbol(f'm_{i}'),
+          transformation_matrix=self.get_transformation(0, i),
+        )
+      )
 
     self.homogeneous_transformation_matrix = self.get_transformation(0, self.len_links)
-
     self.jacobian = self.get_jacobian()
 
   def get_transformation(self, start, end):

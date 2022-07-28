@@ -4,14 +4,10 @@ from lib.symbols import g, t
 
 class ForwardDynamics:
   def __init__(self, forward_kinematics):
-    self.transformations = forward_kinematics.transformations_from_zero_to_i
-    self.generalized_coordinates = forward_kinematics.generalized_coordinates
-
-    self._tau = [sp.Symbol(f'tau_{i + 1}') for i in range(len(self.transformations))]
-    self._m = [sp.Symbol(f'm_{i + 1}') for i in range(len(self.transformations))]
+    self.links = forward_kinematics.links_zero_i
 
     total_lagrangian = 0
-    for i in range(len(self.transformations)):
+    for i in range(len(self.links)):
       total_lagrangian += self.get_link_lagrangian(i)
 
     self.total_lagrangian = sp.simplify(total_lagrangian)
@@ -20,13 +16,15 @@ class ForwardDynamics:
   def get_system_equations_of_motion(self):
     equations = []
 
-    for i in range(len(self.transformations)):
-      q = self.generalized_coordinates[i]
+    for i in range(len(self.links)):
+      q = self.links[i].generalized_coordinate
       dq_dt = sp.diff(q, t)
+
+      tau = sp.Symbol(f'tau_{i}')
 
       eq_1 = sp.Eq(
         sp.diff(sp.diff(self.total_lagrangian, dq_dt), t) - sp.diff(self.total_lagrangian, q),
-        self._tau[i]
+        tau
       )
 
       equations.append(
@@ -36,30 +34,41 @@ class ForwardDynamics:
     return equations
 
   def get_link_kinetic_energy(self, link_index):
-    # Kinetic energy of link i = (1/2) * m_i * (v_i)^2
-    m = self._m[link_index]
+    if self.links[link_index].link_type == 'R':
+      return self.get_link_rotational_kinetic_energy(link_index)
+
+    return self.get_link_linear_kinetic_energy(link_index)
+
+  def get_link_linear_kinetic_energy(self, link_index):
+    m = self.links[link_index].mass
 
     v_x = sp.diff(
-      self.transformations[link_index][0, 3],
+      self.links[link_index].transformation_matrix[0, 3],
       t
     )
 
     v_y = sp.diff(
-      self.transformations[link_index][1, 3],
+      self.links[link_index].transformation_matrix[1, 3],
       t
     )
 
     v_z = sp.diff(
-      self.transformations[link_index][2, 3],
+      self.links[link_index].transformation_matrix[2, 3],
       t
     )
 
     return sp.Rational(1, 2) * m * (v_x**2 + v_y**2 + v_z**2)
 
+  def get_link_rotational_kinetic_energy(self, link_index):
+    q = self.links[link_index].generalized_coordinate
+    j = self.links[link_index].inertia_moment
+
+    return sp.Rational(1, 2) * j * (q ** 2)
+
   def get_link_potential_energy(self, link_index):
     # Potential energy of link i = m_i * g * y_i
-    m = self._m[link_index]
-    return m * g * self.transformations[link_index][1, 3]
+    m = self.links[link_index].mass
+    return m * g * self.links[link_index].transformation_matrix[1, 3]
 
   def get_link_lagrangian(self, link_index):
     return self.get_link_kinetic_energy(link_index) - self.get_link_potential_energy(link_index)

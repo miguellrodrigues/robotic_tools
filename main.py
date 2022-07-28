@@ -1,7 +1,8 @@
 import sympy as sp
 
 from lib.forward_dynamics import ForwardDynamics
-from lib.forward_kinematics import Link, ForwardKinematic
+from lib.forward_kinematics import ForwardKinematic
+from lib.link import Link
 from lib.symbols import t
 
 l1, l2 = sp.symbols('l1 l2')
@@ -9,17 +10,17 @@ l1, l2 = sp.symbols('l1 l2')
 theta1 = sp.Function('theta_1')(t)
 theta2 = sp.Function('theta_2')(t)
 
-j0 = Link([theta1, 0, l1, 0])
-j1 = Link([theta2, 0, l2, 0])
+j0 = Link([theta1, 0, l1, 0], link_type='R')
+j1 = Link([theta2, 0, l2, 0], link_type='R')
 
 fk = ForwardKinematic([j0, j1])
 fd = ForwardDynamics(fk)
 
 print(' ')
-# sp.print_latex(sp.simplify(fk.get_jacobian()))
+sp.print_latex(sp.simplify(fk.get_jacobian()))
 print(' ')
 
-# for eq in fd.equations:
-#     print(' ')
-#     sp.print_latex(eq)
-#     print(' ')
+for eq in fd.equations:
+    print(' ')
+    sp.print_latex(eq)
+    print(' ')
