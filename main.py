@@ -1,4 +1,3 @@
-import numpy as np
 import sympy as sp
 
 from lib.forward_dynamics import ForwardDynamics
@@ -19,3 +18,8 @@ fd = ForwardDynamics(fk)
 print(' ')
 sp.print_latex(sp.simplify(fk.get_homogeneous_transformation_matrix()))
 print(' ')
+
+for eq in fd.equations:
+    print(' ')
+    sp.print_latex(eq)
+    print(' ')
