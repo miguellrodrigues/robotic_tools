@@ -13,18 +13,13 @@ class ForwardKinematic:
 
     for i in range(1, self.len_links + 1):
       m = sp.Symbol(f'm_{i}')
-
       transformation = self.get_transformation(0, i)
-      R = transformation[:3, 3].T
-
-      I = cylinder_inertia_tensor(m)
 
       self.links_zero_i.append(
         Link(
           generalized_coordinate=self.links[i - 1].dhp[0],
           mass=m,
           transformation_matrix=transformation,
-          inertia_tensor=(R @ I @ R.T)[0]
         )
       )
 

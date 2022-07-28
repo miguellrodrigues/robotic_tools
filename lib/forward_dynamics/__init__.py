@@ -38,36 +38,24 @@ class ForwardDynamics:
     return equations
 
   def get_link_kinetic_energy(self, link_index):
-    return self.get_link_translational_kinetic_energy(link_index) + self.get_link_rotational_kinetic_energy(link_index)
-
-  def get_link_translational_kinetic_energy(self, link_index):
-    v = self.rotational_jacobian[:, link_index]
     m = self.links[link_index].mass
 
-    return (sp.Rational(1, 2) * m * v.T @ v)[0]
+    v_x = sp.diff(
+      self.links[link_index].transformation_matrix[0, 3],
+      t
+    )
 
-    # v_x = sp.diff(
-    #   self.links[link_index].transformation_matrix[0, 3],
-    #   t
-    # )
-    #
-    # v_y = sp.diff(
-    #   self.links[link_index].transformation_matrix[1, 3],
-    #   t
-    # )
-    #
-    # v_z = sp.diff(
-    #   self.links[link_index].transformation_matrix[2, 3],
-    #   t
-    # )
-    #
-    # return sp.Rational(1, 2) * m * (v_x**2 + v_y**2 + v_z**2)
+    v_y = sp.diff(
+      self.links[link_index].transformation_matrix[1, 3],
+      t
+    )
 
-  def get_link_rotational_kinetic_energy(self, link_index):
-    rot_jacobian = self.rotational_jacobian[:, link_index]
-    I = self.links[link_index].inertia_tensor
+    v_z = sp.diff(
+      self.links[link_index].transformation_matrix[2, 3],
+      t
+    )
 
-    return (sp.Rational(1, 2) * rot_jacobian.T * I @ rot_jacobian)[0]
+    return sp.Rational(1, 2) * m * (v_x**2 + v_y**2 + v_z**2)
 
   def get_link_potential_energy(self, link_index):
     # Potential energy of link i = m_i * g * y_i

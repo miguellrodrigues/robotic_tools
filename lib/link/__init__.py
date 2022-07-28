@@ -6,12 +6,10 @@ class Link:
       self,
       dhp=None,
       generalized_coordinate=None,
-      inertia_tensor=None,
       mass=None,
       transformation_matrix=None
   ):
     self.dhp = dhp
-    self.inertia_tensor = inertia_tensor
     self.generalized_coordinate = generalized_coordinate
 
     if generalized_coordinate is None and dhp is None:
