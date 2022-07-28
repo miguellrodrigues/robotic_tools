@@ -1,3 +1,3 @@
 import sympy as sp
 
-g, t = sp.symbols('g t')
+g, t, h, r = sp.symbols('g t h r')

@@ -1,7 +1,7 @@
 import sympy as sp
 
 from lib.link import Link
-from lib.utils import compute_homogeneous_transformation
+from lib.utils import compute_homogeneous_transformation, cylinder_inertia_tensor
 
 
 class ForwardKinematic:
@@ -12,18 +12,29 @@ class ForwardKinematic:
     self.links_zero_i = []
 
     for i in range(1, self.len_links + 1):
+      m = sp.Symbol(f'm_{i}')
+
+      transformation = self.get_transformation(0, i)
+      R = transformation[:3, 3].T
+
+      I = cylinder_inertia_tensor(m)
+
       self.links_zero_i.append(
         Link(
           generalized_coordinate=self.links[i - 1].dhp[0],
-          link_type=self.links[i - 1].link_type,
-          inertia_moment=sp.Symbol(f'J_{i}'),
-          mass=sp.Symbol(f'm_{i}'),
-          transformation_matrix=self.get_transformation(0, i),
+          mass=m,
+          transformation_matrix=transformation,
+          inertia_tensor=(R @ I @ R.T)[0]
         )
       )
 
-    self.homogeneous_transformation_matrix = self.get_transformation(0, self.len_links)
-    self.jacobian = self.get_jacobian()
+    self.homogeneous_transformation_matrix = sp.simplify(
+      self.get_transformation(0, self.len_links)
+    )
+
+    self.jacobian = sp.simplify(
+      self.get_jacobian()
+    )
 
   def get_transformation(self, start, end):
     tf = compute_homogeneous_transformation(self.links, start, end)

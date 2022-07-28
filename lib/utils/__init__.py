@@ -1,5 +1,6 @@
 import sympy as sp
 from lib.frame import z_rotation_matrix, translation_matrix, x_rotation_matrix
+from lib.symbols import h, r
 
 
 def compute_link_transformation(dhp):
@@ -22,3 +23,13 @@ def compute_homogeneous_transformation(links, start, end):
 		transformation_matrix = transformation_matrix @ transformation_matrix_i
 
 	return transformation_matrix
+
+
+def cylinder_inertia_tensor(m):
+	I = sp.Matrix([
+		[sp.Rational(1, 12) * m * (3*r**2 + h**2), 0, 0],
+		[0, sp.Rational(1, 12)*m*(3*r**2 + h**2), 0],
+		[0, 0, sp.Rational(1, 2)*m*r**2]
+	])
+
+	return I
