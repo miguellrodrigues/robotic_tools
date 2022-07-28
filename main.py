@@ -16,10 +16,10 @@ fk = ForwardKinematic([j0, j1])
 fd = ForwardDynamics(fk)
 
 print(' ')
-sp.print_latex(sp.simplify(fk.get_homogeneous_transformation_matrix()))
+# sp.print_latex(sp.simplify(fk.get_jacobian()))
 print(' ')
 
-for eq in fd.equations:
-    print(' ')
-    sp.print_latex(eq)
-    print(' ')
+# for eq in fd.equations:
+#     print(' ')
+#     sp.print_latex(eq)
+#     print(' ')
