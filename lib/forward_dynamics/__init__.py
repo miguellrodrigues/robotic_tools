@@ -22,14 +22,15 @@ class ForwardDynamics:
 
     for i in range(len(self.transformations)):
       q = self.generalized_coordinates[i]
+      dq_dt = sp.diff(q, t)
 
-      eq = sp.Eq(
-        sp.diff(sp.diff(self.total_lagrangian, sp.diff(q, t)), t) - sp.diff(self.total_lagrangian, q),
+      eq_1 = sp.Eq(
+        sp.diff(sp.diff(self.total_lagrangian, dq_dt), t) - sp.diff(self.total_lagrangian, q),
         self._tau[i]
       )
 
       equations.append(
-        sp.simplify(eq)
+        sp.simplify(eq_1)
       )
 
     return equations
