@@ -10,11 +10,20 @@ class ForwardDynamics:
     self.translational_jacobian = self.jacobian[3:, :]
     self.rotational_jacobian    = self.jacobian[:3, :]
 
-    total_lagrangian = 0
-    for i in range(len(self.links)):
-      total_lagrangian += self.get_link_lagrangian(i)
 
-    self.total_lagrangian = sp.simplify(total_lagrangian)
+    # # # # # # # # # # # # # # #
+
+
+    D = self.get_total_kinetic_energy()
+    P = self.get_total_potential_energy()
+
+    q = [self.links[i].generalized_coordinate for i in range(len(self.links))]
+    dq = sp.Matrix([sp.diff(q[i], t) for i in range(len(self.links))])
+
+    self.K = (sp.Rational(1, 2) * dq.T * D @ dq)[0]
+    self.P = P
+
+    self.total_lagrangian = self.K - self.P
     self.equations = self.get_system_equations_of_motion()
 
   def get_system_equations_of_motion(self):
@@ -37,43 +46,26 @@ class ForwardDynamics:
 
     return equations
 
-  def get_link_kinetic_energy(self, link_index):
-    return self.get_link_translational_kinetic_energy(link_index) + self.get_link_rotational_kinetic_energy(link_index)
+  def get_total_kinetic_energy(self):
+    D = 0
 
-  def get_link_translational_kinetic_energy(self, link_index):
-    v = self.rotational_jacobian[:, link_index]
-    m = self.links[link_index].mass
+    for i in range(len(self.links)):
+      m = self.links[i].mass
+      I = self.links[i].inertia_tensor
 
-    return (sp.Rational(1, 2) * m * v.T @ v)[0]
+      trans_jacobian = self.translational_jacobian[:, i]
+      rot_jacobian = self.rotational_jacobian[:, i]
 
-    # v_x = sp.diff(
-    #   self.links[link_index].transformation_matrix[0, 3],
-    #   t
-    # )
-    #
-    # v_y = sp.diff(
-    #   self.links[link_index].transformation_matrix[1, 3],
-    #   t
-    # )
-    #
-    # v_z = sp.diff(
-    #   self.links[link_index].transformation_matrix[2, 3],
-    #   t
-    # )
-    #
-    # return sp.Rational(1, 2) * m * (v_x**2 + v_y**2 + v_z**2)
+      D += (m * trans_jacobian.T @ trans_jacobian + rot_jacobian.T * I @ rot_jacobian)[0]
 
-  def get_link_rotational_kinetic_energy(self, link_index):
-    rot_jacobian = self.rotational_jacobian[:, link_index]
-    I = self.links[link_index].inertia_tensor
+    return D
 
-    return (sp.Rational(1, 2) * rot_jacobian.T * I @ rot_jacobian)[0]
+  def get_total_potential_energy(self):
+    P = 0
 
-  def get_link_potential_energy(self, link_index):
-    # Potential energy of link i = m_i * g * y_i
-    m = self.links[link_index].mass
-    return m * g * self.links[link_index].transformation_matrix[1, 3]
+    for i in range(len(self.links)):
+      m = self.links[i].mass
+      P += m * g * self.links[i].transformation_matrix[1, 3]
 
-  def get_link_lagrangian(self, link_index):
-    return self.get_link_kinetic_energy(link_index) - self.get_link_potential_energy(link_index)
+    return P
 
