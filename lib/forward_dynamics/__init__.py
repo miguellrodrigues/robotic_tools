@@ -47,7 +47,6 @@ class ForwardDynamics:
       I = self.links[i].inertia_tensor
 
       w = sp.zeros(3, len(self.q))
-
       w[:, :i + 1] = self.rotational_jacobian[:, :i + 1]
       w @= self.dq_dt
 

@@ -53,22 +53,23 @@ class ForwardKinematic:
 
     j = sp.zeros(6, self.len_links)
 
-    # J_pi = Z_i-1 x (P - pi-1)
-    # J_oi = z_i-1
+    # J_vi = Z_i-1 x (P - pi-1)
+    # J_wi = z_i-1
 
     P = htm[:3, 3]
 
-    p_i = sp.Matrix([0, 0, 0])
+    p_i = sp.zeros(3, 1)
     z_i = sp.Matrix([0, 0, 1])
 
     for i in range(self.len_links):
       p_diff = (P - p_i)
+
       J_vi = z_i
+      J_wi = sp.zeros(3, 1)
 
       if self.links[i].link_type == 'R':
         J_vi = z_i.cross(p_diff)
-
-      J_wi = z_i
+        J_wi = z_i
 
       J = sp.Matrix([J_vi, J_wi])
       j[:, i] = J
