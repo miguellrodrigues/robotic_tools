@@ -22,7 +22,7 @@ class ForwardKinematic:
         Link(
           generalized_coordinate=self.links[i - 1].dhp[0],
           mass=m,
-          transformation_matrix=transformation,
+          transformation_matrix=sp.simplify(transformation),
           inertia_tensor=I,
         )
       )
