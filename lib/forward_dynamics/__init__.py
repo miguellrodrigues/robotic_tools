@@ -22,9 +22,9 @@ class ForwardDynamics:
 
     for k in range(len(self.links)):
       qk = self.q[k]
+      gk = P.diff(qk)
 
       tau = sp.Symbol(f'tau_{k + 1}')
-      gk = P.diff(qk)
 
       sum_a = 0
       sum_b = 0
