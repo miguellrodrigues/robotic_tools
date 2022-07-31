@@ -16,6 +16,7 @@ class ForwardKinematic:
       I = sp.symarray(f'I({i})', (3, 3))
 
       transformation = self.get_transformation(0, i)
+      # I = R @ I @ R.T
 
       self.links_zero_i.append(
         Link(
