@@ -4,13 +4,15 @@ from lib.symbols import g, t
 
 class ForwardDynamics:
   def __init__(self, forward_kinematics):
-    self.links = forward_kinematics.links_zero_i
     self.jacobian = forward_kinematics.get_jacobian()
+    self.links = forward_kinematics.links_zero_i
 
     self.q = sp.Matrix([link.generalized_coordinate for link in self.links])
     self.dq_dt = self.q.diff(t)
 
-    self.rotational_jacobian = self.jacobian[3:, ::-1]
+    self.len_q = len(self.q)
+
+    self.w = self.jacobian[3:, :]
 
     k, p = self.get_total_energy()
 
@@ -23,39 +25,41 @@ class ForwardDynamics:
     for i in range(len(self.links)):
       q = self.q[i]
       dq_dt = self.dq_dt[i]
-
       tau = sp.Symbol(f'tau_{i + 1}')
 
-      eq_1 = sp.Eq(
-        sp.diff(sp.diff(self.total_lagrangian, dq_dt), t) - sp.diff(self.total_lagrangian, q),
-        tau
-      )
+      EQ = sp.diff(sp.diff(self.total_lagrangian, dq_dt), t) - sp.diff(self.total_lagrangian, q)
 
       equations.append(
-        eq_1.simplify()
+        sp.Eq(tau, sp.simplify(EQ[0]))
       )
 
     return equations
 
   def get_total_energy(self):
-    translational_kinetic_energy = 0
-    rotational_kinetic_energy = 0
-    potential_energy = 0
+    # translational_kinetic_energy = 0
+    potential_energy = sp.zeros(1, 1)
+    D = sp.zeros(self.len_q, self.len_q)
+    G = sp.Matrix([0, -g, 0])
 
     for i in range(len(self.links)):
       m = self.links[i].mass
       I = self.links[i].inertia_tensor
 
-      w = sp.zeros(3, len(self.q))
-      w[:, :i + 1] = self.rotational_jacobian[:, :i + 1]
-      w @= self.dq_dt
+      Jwi = sp.zeros(3, len(self.q))
+      Jvi = sp.zeros(3, len(self.q))
+
+      Jwi[:, :i + 1] = self.w[:, :i + 1]
 
       r = self.links[i].transformation_matrix[:3, 3]
-      v = r.diff(t)
+      dr_dq = [sp.diff(r, q) for q in self.q]
 
-      translational_kinetic_energy += sp.Rational(1, 2) * m * (v.T @ v)[0]
-      rotational_kinetic_energy += sp.Rational(1, 2) * (w.T @ I @ w)[0]
-      potential_energy += m * g * r[1]
+      for j in range(self.len_q):
+        Jvi[:, j] = dr_dq[j]
 
-    return translational_kinetic_energy + rotational_kinetic_energy, potential_energy
+      D += (m * Jvi.T @ Jvi) + (Jwi.T @ I @ Jwi)
+      potential_energy += m * G.T @ r
+
+    K = sp.Rational(1, 2) * self.dq_dt.T @ D @ self.dq_dt
+
+    return K, potential_energy
 
