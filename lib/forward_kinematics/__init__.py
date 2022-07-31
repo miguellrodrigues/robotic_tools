@@ -63,11 +63,14 @@ class ForwardKinematic:
 
     for i in range(self.len_links):
       p_diff = (P - p_i)
+      J_vi = z_i
 
-      J_pi = z_i.cross(p_diff)
-      J_oi = z_i
+      if self.links[i].link_type == 'R':
+        J_vi = z_i.cross(p_diff)
 
-      J = sp.Matrix([J_pi, J_oi])
+      J_wi = z_i
+
+      J = sp.Matrix([J_vi, J_wi])
       j[:, i] = J
 
       transformation = self.links_zero_i[i].transformation_matrix
@@ -75,4 +78,4 @@ class ForwardKinematic:
       p_i = transformation[:3, 3]
       z_i = transformation[:3, 2]
 
-    return j[:, :]
+    return j

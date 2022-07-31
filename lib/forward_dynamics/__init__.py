@@ -52,7 +52,7 @@ class ForwardDynamics:
       w @= self.dq_dt
 
       r = self.links[i].transformation_matrix[:3, 3]
-      v = sp.simplify(r.diff(t))
+      v = r.diff(t)
 
       translational_kinetic_energy += sp.Rational(1, 2) * m * (v.T @ v)[0]
       rotational_kinetic_energy += sp.Rational(1, 2) * (w.T @ I @ w)[0]

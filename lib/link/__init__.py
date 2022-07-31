@@ -8,11 +8,13 @@ class Link:
       generalized_coordinate=None,
       mass=None,
       transformation_matrix=None,
-      inertia_tensor=None
+      inertia_tensor=None,
+      link_type='R'
   ):
     self.dhp = dhp
     self.generalized_coordinate = generalized_coordinate
     self.inertia_tensor = inertia_tensor
+    self.link_type = link_type
 
     if generalized_coordinate is None and dhp is None:
       raise ValueError('Either generalized_coordinate or dhp must be specified')

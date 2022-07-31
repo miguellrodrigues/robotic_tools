@@ -13,9 +13,8 @@ theta3 = sp.Function('q_3')(t)
 
 j0 = Link([theta1, 0, l1, 0])
 j1 = Link([theta2, 0, l2, 0])
-j2 = Link([theta3, l3, 0, 0])
 
-fk = ForwardKinematic([j0, j1, j2])
+fk = ForwardKinematic([j0, j1])
 
 print(' ')
 sp.print_latex(sp.simplify(fk.get_jacobian()))
