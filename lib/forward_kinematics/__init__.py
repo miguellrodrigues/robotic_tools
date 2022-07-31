@@ -13,7 +13,13 @@ class ForwardKinematic:
 
     for i in range(1, self.len_links + 1):
       m = sp.Symbol(f'm_{i}')
-      I = sp.symarray(f'I({i})', (3, 3))
+      # I = sp.symarray(f'I({i})', (3, 3))
+
+      I = sp.Matrix([
+        [sp.Symbol(f'I_{i}(xx)'), sp.Symbol(f'I_{i}(xy)'), sp.Symbol(f'I_{i}(xz)')],
+        [sp.Symbol(f'I_{i}(xy)'), sp.Symbol(f'I_{i}(yy)'), sp.Symbol(f'I_{i}(yz)')],
+        [sp.Symbol(f'I_{i}(xz)'), sp.Symbol(f'I_{i}(yz)'), sp.Symbol(f'I_{i}(zz)')],
+      ])
 
       transformation = self.get_transformation(0, i)
       # I = R @ I @ R.T
