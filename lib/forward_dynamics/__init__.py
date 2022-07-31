@@ -60,16 +60,16 @@ class ForwardDynamics:
       m = self.links[i].mass
       I = self.links[i].inertia_tensor
 
-      Jwi = sp.zeros(3, len(self.q))
       Jvi = sp.zeros(3, len(self.q))
-
-      Jwi[:, :i + 1] = self.w[:, :i + 1]
+      Jwi = sp.zeros(3, len(self.q))
 
       r = self.links[i].transformation_matrix[:3, 3]
-      dr_dq = [sp.diff(r, q) for q in self.q]
+      dr_dq = [r.diff(q) for q in self.q]
 
       for j in range(self.len_q):
         Jvi[:, j] = dr_dq[j]
+
+      Jwi[:, :i + 1] = self.w[:, :i + 1]
 
       D += (m * Jvi.T @ Jvi) + (Jwi.T @ I @ Jwi)
       potential_energy += m * G.T @ r
