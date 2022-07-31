@@ -70,7 +70,6 @@ class ForwardDynamics:
         Jvi[:, j] = dr_dq[j]
 
       Jwi[:, :i + 1] = self.w[:, :i + 1]
-
       D += (m * Jvi.T @ Jvi) + (Jwi.T @ I @ Jwi)
       potential_energy += m * G.T @ r
 
