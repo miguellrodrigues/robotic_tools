@@ -1,7 +1,7 @@
 import sympy as sp
 
 from lib.link import Link
-from lib.utils import compute_homogeneous_transformation, cylinder_inertia_tensor
+from lib.utils import compute_homogeneous_transformation
 
 
 class ForwardKinematic:
@@ -13,18 +13,23 @@ class ForwardKinematic:
 
     for i in range(1, self.len_links + 1):
       m = sp.Symbol(f'm_{i}')
+      # I = sp.symarray(f'I({i})', (3, 3))
+
+      I = sp.Matrix([
+        [sp.Symbol(f'I_{i}(xx)'), sp.Symbol(f'I_{i}(xy)'), sp.Symbol(f'I_{i}(xz)')],
+        [sp.Symbol(f'I_{i}(xy)'), sp.Symbol(f'I_{i}(yy)'), sp.Symbol(f'I_{i}(yz)')],
+        [sp.Symbol(f'I_{i}(xz)'), sp.Symbol(f'I_{i}(yz)'), sp.Symbol(f'I_{i}(zz)')],
+      ])
 
       transformation = self.get_transformation(0, i)
-      R = transformation[:3, 3].T
-
-      I = cylinder_inertia_tensor(m)
+      # I = R @ I @ R.T
 
       self.links_zero_i.append(
         Link(
           generalized_coordinate=self.links[i - 1].dhp[0],
           mass=m,
-          transformation_matrix=transformation,
-          inertia_tensor=(R @ I @ R.T)[0]
+          transformation_matrix=sp.simplify(transformation),
+          inertia_tensor=I,
         )
       )
 
@@ -54,24 +59,28 @@ class ForwardKinematic:
 
     j = sp.zeros(6, self.len_links)
 
-    # J_pi = Z_i-1 x (P - pi-1)
-    # J_oi = z_i-1
+    # J_vi = Z_i-1 x (P - pi-1)
+    # J_wi = z_i-1
 
     P = htm[:3, 3]
 
-    p_i = sp.Matrix([0, 0, 0])
+    p_i = sp.zeros(3, 1)
     z_i = sp.Matrix([0, 0, 1])
 
-    for i in range(1, self.len_links + 1):
+    for i in range(self.len_links):
       p_diff = (P - p_i)
 
-      J_pi = z_i.cross(p_diff)
-      J_oi = z_i
+      J_vi = z_i
+      J_wi = sp.zeros(3, 1)
 
-      J = sp.Matrix([J_pi, J_oi])
-      j[:, i - 1] = J
+      if self.links[i].link_type == 'R':
+        J_vi = z_i.cross(p_diff)
+        J_wi = z_i
 
-      transformation = self.get_transformation(0, i)
+      J = sp.Matrix([J_vi, J_wi])
+      j[:, i] = J
+
+      transformation = self.links_zero_i[i].transformation_matrix
 
       p_i = transformation[:3, 3]
       z_i = transformation[:3, 2]
