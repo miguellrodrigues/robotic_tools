@@ -8,7 +8,7 @@ from lib.link import Link
 from lib.frame import x_y_z_rotation_matrix
 
 
-desired_position = np.array([[100], [0], [0]])
+desired_position = np.array([[892.07], [0], [1170]])
 desired_rotation = x_y_z_rotation_matrix(0, 0, 0)[:3, :3]
 
 
@@ -17,9 +17,9 @@ np.set_printoptions(suppress=True, precision=3)
 
 q1, q2, q3 = sp.symbols('q_1 q_2 q_3')
 
-j0 = Link([q1,          -450, 150, np.pi/2])
-j1 = Link([q2, 0,   590, np.pi])
-j2 = Link([q3, 0, 130+647.07, -np.pi/2])
+j0 = Link([q1, 450,  150, np.pi/2])
+j1 = Link([q2,  0,   590, 0])
+j2 = Link([q3,  0,   742.07, 0])
 
 fk = ForwardKinematic([j0, j1, j2])
 
