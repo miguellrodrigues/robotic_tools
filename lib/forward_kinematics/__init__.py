@@ -28,18 +28,13 @@ class ForwardKinematic:
         Link(
           generalized_coordinate=self.links[i - 1].dhp[0],
           mass=m,
-          transformation_matrix=sp.simplify(transformation),
+          transformation_matrix=transformation,
           inertia_tensor=I,
         )
       )
 
-    self.homogeneous_transformation_matrix = sp.simplify(
-      self.get_transformation(0, self.len_links)
-    )
-
-    self.jacobian = sp.simplify(
-      self.get_jacobian()
-    )
+    self.homogeneous_transformation_matrix = self.get_transformation(0, self.len_links)
+    self.jacobian = self.get_jacobian()
 
   def get_transformation(self, start, end):
     tf = compute_homogeneous_transformation(self.links, start, end)

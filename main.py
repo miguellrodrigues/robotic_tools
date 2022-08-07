@@ -1,3 +1,4 @@
+import numpy as np
 import sympy as sp
 
 from lib.forward_dynamics import ForwardDynamics
@@ -15,13 +16,3 @@ j1 = Link([q2, 0, a2, 0])
 
 fk = ForwardKinematic([j0, j1])
 
-print(' ')
-sp.print_latex(sp.simplify(fk.get_jacobian()))
-print(' ')
-
-fd = ForwardDynamics(fk)
-
-for eq in fd.equations:
-  print(' ')
-  sp.print_latex(eq)
-  print(' ')
