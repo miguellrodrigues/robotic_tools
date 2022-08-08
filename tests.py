@@ -18,8 +18,8 @@ np.set_printoptions(suppress=True, precision=3)
 q1, q2, q3 = sp.symbols('q_1 q_2 q_3')
 
 j0 = Link([q1, 450,  150, np.pi/2])
-j1 = Link([q2,  0,   590, 0])
-j2 = Link([q3,  0,   742.07, 0])
+j1 = Link([q2 + np.pi/2,  0,   720, 0])
+j2 = Link([q3 - np.pi/2,  0,   742.07, 0])
 
 fk = ForwardKinematic([j0, j1, j2])
 
@@ -39,21 +39,28 @@ J = sp.lambdify(
 )
 
 # solving the inverse kinematics for position
-theta_i = np.array([.0, .0, .0])
-S = desired_position - P(theta_i[0], theta_i[1], theta_i[2])
-err = np.linalg.norm(S)
+theta_k = np.array([[.0], [.0], [.0]])
+err_tolerance = 1e-6
+F = err_tolerance + 1
+gamma = 1
 
-err_tolerance = 1e-3
+while F > err_tolerance:
+  P_k = P(theta_k[0, 0], theta_k[1, 0], theta_k[2, 0])
 
-while err > err_tolerance:
-  P_k = P(theta_i[0], theta_i[1], theta_i[2])
-  J_k = J(theta_i[0], theta_i[1], theta_i[2])
+  # associated function G(theta) = P(theta) - P_d
+  G = P_k - desired_position
 
-  theta_i += (np.linalg.pinv(J_k) @ S)[:, 0]
+  # objective function F(theta) = 1/2 G(theta)^T G(theta)
+  F = .5 * G.T @ G
 
-  S = desired_position - P(theta_i[0], theta_i[1], theta_i[2])
+  # gradient of F(theta) 'Jacobian'
+  J_k = J(theta_k[0, 0], theta_k[1, 0], theta_k[2, 0])
 
-  err = np.linalg.norm(S)
+  theta_k_1 = theta_k - gamma * np.linalg.pinv(J_k) @ G
+  theta_k = theta_k_1
+
+
+theta_i = theta_k[:, 0]
 
 print(' ')
 print('q1:', theta_i[0])
