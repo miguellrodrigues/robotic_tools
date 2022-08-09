@@ -8,8 +8,12 @@ from lib.link import Link
 from lib.frame import x_y_z_rotation_matrix
 
 
-desired_position = np.array([[892.07], [0], [1170]])
-desired_rotation = x_y_z_rotation_matrix(0, 0, 0)[:3, :3]
+desired_position = np.array([[797.07], [0], [1170]])
+desired_rotation = np.array([
+  [1, 0, 0],
+  [0, -1, 0],
+  [0, 0, -1]
+])  # x_y_z_rotation_matrix(0, 0, 0)[:3, :3]
 
 
 np.set_printoptions(suppress=True, precision=3)
@@ -19,7 +23,7 @@ q1, q2, q3 = sp.symbols('q_1 q_2 q_3')
 
 j0 = Link([q1, 450,  150, np.pi/2])
 j1 = Link([q2 + np.pi/2,  0,   720, 0])
-j2 = Link([q3 - np.pi/2,  0,   742.07, 0])
+j2 = Link([q3 - np.pi/2,  0,   647.07, 0])
 
 fk = ForwardKinematic([j0, j1, j2])
 
@@ -53,7 +57,7 @@ while F > err_tolerance:
   # objective function F(theta) = 1/2 G(theta)^T G(theta)
   F = .5 * G.T @ G
 
-  # gradient of F(theta) 'Jacobian'
+  # gradient of F(theta) 'Jacobian's
   J_k = J(theta_k[0, 0], theta_k[1, 0], theta_k[2, 0])
 
   theta_k_1 = theta_k - gamma * np.linalg.pinv(J_k) @ G
@@ -61,13 +65,14 @@ while F > err_tolerance:
 
 
 theta_i = theta_k[:, 0]
+oc = P(theta_i[0], theta_i[1], theta_i[2])[:, 0]
 
 print(' ')
 print('q1:', theta_i[0])
 print('q2:', theta_i[1])
 print('q3:', theta_i[2])
 print(' ')
-print('P:', P(theta_i[0], theta_i[1], theta_i[2])[:, 0])
+print('Oc:', oc)
 
 R36 = R03(theta_i[0], theta_i[1], theta_i[2]).T @ desired_rotation
 
@@ -75,8 +80,8 @@ R36 = R03(theta_i[0], theta_i[1], theta_i[2]).T @ desired_rotation
 q4, q5, q6 = sp.symbols('q_4 q_5 q_6')
 
 _R36 = M([
-  [c(q4)*c(q5)*c(q6) - s(q4)*s(q6), -c(q4)*c(q5)*c(q6) - s(q4)*s(q6), c(q4)*s(q5)],
-  [s(q4)*c(q5)*c(q6) + c(q4)*s(q6), -s(q4)*c(q5)*c(q6) + c(q4)*s(q6), s(q4)*s(q5)],
+  [c(q4)*c(q5)*c(q6) - s(q4)*s(q6), -c(q4)*c(q5)*c(q6) - s(q4)*c(q6), c(q4)*s(q5)],
+  [s(q4)*c(q5)*c(q6) + c(q4)*s(q6), -s(q4)*c(q5)*s(q6) + c(q4)*c(q6), s(q4)*s(q5)],
   [-s(q5)*c(q6), s(q5)*s(q6), c(q5)],
 ])
 
@@ -88,10 +93,10 @@ EQS = [
 q5_sol = sp.solve(EQS[8], q5)[0]
 
 # solving for q4
-q4_sol = sp.solve(EQS[5].subs({q5: q5_sol}), q4)[0]
+q4_sol = sp.solve(EQS[5].subs({q5: q5_sol}), q4)
 
 # solving for q6
-q6_sol = sp.solve(EQS[7].subs({q5: q5_sol}), q6)[0]
+q6_sol = sp.solve(EQS[7].subs({q5: q5_sol}), q6)
 
 print(' ')
 print('q4:', q4_sol)
@@ -101,3 +106,7 @@ print(' ')
 
 # # # # # #
 
+ee_pos = oc + (95 * desired_rotation @ np.array([0, 0, 1]))
+
+print('EE position:', ee_pos)
+print(' ')
