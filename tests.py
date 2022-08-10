@@ -5,13 +5,12 @@ from sympy import cos as c, sin as s, Matrix as M
 
 from lib.forward_kinematics import ForwardKinematic
 from lib.link import Link
-from lib.frame import x_y_z_rotation_matrix
 
 
 desired_position = np.array([[797.07], [0], [1170]])
 desired_rotation = np.array([
-  [1, 0, 0],
-  [0, -1, 0],
+  [-1, 0, 0],
+  [0, 1, 0],
   [0, 0, -1]
 ])  # x_y_z_rotation_matrix(0, 0, 0)[:3, :3]
 
@@ -23,7 +22,7 @@ q1, q2, q3 = sp.symbols('q_1 q_2 q_3')
 
 j0 = Link([q1, 450,  150, np.pi/2])
 j1 = Link([q2 + np.pi/2,  0,   720, 0])
-j2 = Link([q3 - np.pi/2,  0,   647.07, 0])
+j2 = Link([q3 - np.pi/2,  0,   647.07, np.pi/2])
 
 fk = ForwardKinematic([j0, j1, j2])
 
@@ -86,17 +85,19 @@ _R36 = M([
 ])
 
 EQS = [
-  sp.Eq(R36[i, j], _R36[i, j]) for i in range(3) for j in range(3)
+  sp.Eq(c(q5 + np.pi/2), R36[2, 2]),
+  sp.Eq(-s(q4)*s(q5 + np.pi/2), R36[1, 2]),
+  sp.Eq(-s(q5 + np.pi/2)*s(q6 - np.pi/2), R36[2, 1]),
 ]
 
 # solving for q5
-q5_sol = sp.solve(EQS[8], q5)[0]
+q5_sol = sp.solve(EQS[0], q5)[0]
 
 # solving for q4
-q4_sol = sp.solve(EQS[5].subs({q5: q5_sol}), q4)
+q4_sol = sp.solve(EQS[1].subs({q5: q5_sol}), q4)
 
 # solving for q6
-q6_sol = sp.solve(EQS[7].subs({q5: q5_sol}), q6)
+q6_sol = sp.solve(EQS[2].subs({q5: q5_sol}), q6)
 
 print(' ')
 print('q4:', q4_sol)
