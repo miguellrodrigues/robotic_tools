@@ -44,7 +44,7 @@ def ik(
   i = 0
 
   while error and i < max_iterations:
-    htm = fk.compute_homogeneous_transformation_matrix(theta_i + home_offset)
+    htm = fk.compute_homogeneous_transformation_matrix(theta_i)
     i_htm = inverse_transformation(htm)
 
     Tbd = i_htm @ desired_pose
@@ -52,7 +52,7 @@ def ik(
 
     s = se3_to_vec(log_tbd)
 
-    J = fk.compute_jacobian(theta_i + home_offset)
+    J = fk.compute_jacobian(theta_i)
 
     d_theta = np.linalg.pinv(J) @ s
     theta_i += (lmbd * d_theta)
@@ -70,4 +70,4 @@ def ik(
   if verbose:
     print(f'Iterations: {i}')
 
-  return theta_i + home_offset, not error
+  return theta_i, not error

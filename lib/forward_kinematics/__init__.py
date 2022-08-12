@@ -5,10 +5,11 @@ from lib.utils import compute_homogeneous_transformation
 
 
 class ForwardKinematic:
-  def __init__(self, links):
+  def __init__(self, links, offset=None):
     self.links = links
     self.len_links = len(self.links)
     self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
+    self.offset = offset
 
     self.links_zero_i = []
 
@@ -57,10 +58,10 @@ class ForwardKinematic:
     return self.homogeneous_transformation_matrix
 
   def compute_jacobian(self, q):
-    return self.lambdify_jacobian(q)
+    return self.lambdify_jacobian(q + self.offset)
 
   def compute_homogeneous_transformation_matrix(self, q):
-    return self.lambdify_htm(q)
+    return self.lambdify_htm(q + self.offset)
 
   def get_spacial_jacobian(self):
     return self.jacobian[:3, :]
