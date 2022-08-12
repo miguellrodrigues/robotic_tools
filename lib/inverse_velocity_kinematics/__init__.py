@@ -13,13 +13,13 @@ np.set_printoptions(suppress=True, precision=6)
 def ik(
   desired_transformation=None,
   fk: ForwardKinematic = None,
-  home_offset=None,
   initial_guess=None,
   epsilon_wb=1e-5,
   epsilon_vb=1e-5,
   max_iterations=1500,
   lmbd=.1,
   verbose=False):
+
   # transformation_data = [x, y, z, rx, ry, rz]
   # x, y, z: position of the end effector
   # rx, ry, rz: orientation of the end effector
@@ -66,8 +66,5 @@ def ik(
 
     if verbose:
       print(f'Iteration {i}, s = {s}')
-
-  if verbose:
-    print(f'Iterations: {i}')
 
   return theta_i, not error
