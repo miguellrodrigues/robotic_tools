@@ -8,6 +8,7 @@ class ForwardKinematic:
   def __init__(self, links):
     self.links = links
     self.len_links = len(self.links)
+    self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
 
     self.links_zero_i = []
 
@@ -36,12 +37,30 @@ class ForwardKinematic:
     self.homogeneous_transformation_matrix = self.get_transformation(0, self.len_links)
     self.jacobian = self.get_jacobian()
 
+    self.lambdify_jacobian = sp.lambdify(
+      [self.generalized_coordinates],
+      self.jacobian,
+      modules=['numpy'],
+    )
+
+    self.lambdify_htm = sp.lambdify(
+      [self.generalized_coordinates],
+      self.homogeneous_transformation_matrix,
+      modules=['numpy'],
+    )
+
   def get_transformation(self, start, end):
     tf = compute_homogeneous_transformation(self.links, start, end)
     return tf
 
   def get_homogeneous_transformation_matrix(self):
     return self.homogeneous_transformation_matrix
+
+  def compute_jacobian(self, q):
+    return self.lambdify_jacobian(q)
+
+  def compute_homogeneous_transformation_matrix(self, q):
+    return self.lambdify_htm(q)
 
   def get_spacial_jacobian(self):
     return self.jacobian[:3, :]
@@ -72,7 +91,7 @@ class ForwardKinematic:
         J_vi = z_i.cross(p_diff)
         J_wi = z_i
 
-      J = sp.Matrix([J_vi, J_wi])
+      J = sp.Matrix([J_wi, J_vi])
       j[:, i] = J
 
       transformation = self.links_zero_i[i].transformation_matrix
