@@ -14,8 +14,8 @@ def ik(
   desired_transformation=None,
   fk: ForwardKinematic = None,
   initial_guess=None,
-  epsilon_wb=1e-5,
-  epsilon_vb=1e-5,
+  epsilon_wb=1e-7,
+  epsilon_vb=1e-7,
   max_iterations=1500,
   lmbd=.1,
   verbose=False):
@@ -67,4 +67,4 @@ def ik(
     if verbose:
       print(f'Iteration {i}, s = {s}')
 
-  return theta_i, not error
+  return theta_i - fk.offset, desired_pose, not error

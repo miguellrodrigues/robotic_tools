@@ -20,9 +20,9 @@ np.set_printoptions(suppress=True, precision=3)
 
 q1, q2, q3 = sp.symbols('q_1 q_2 q_3')
 
-j0 = Link([q1, 450,  150, np.pi/2])
+j0 = Link([q1, 450,  150, sp.pi/2])
 j1 = Link([q2,  0,   720, 0])
-j2 = Link([q3,  0,   647.07, -np.pi/2])
+j2 = Link([q3,  0,   647.07, -sp.pi/2])
 
 home_offset = np.array([0, np.pi/2, -np.pi/2])
 fk = ForwardKinematic([j0, j1, j2], offset=home_offset)
