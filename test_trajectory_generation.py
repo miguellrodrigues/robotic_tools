@@ -15,11 +15,11 @@ plt.style.use([
 ])
 
 
-lmbd_start = 1
-lmbd_end = 1
+lmbd_start = .1
+lmbd_end = .1
 
-start_transformation = np.array([892.07, .0, 1170, 0, 0, 0])
-desired_transformation = np.array([585.95, -585.95, 250.97, 0, 0, 0])
+start_transformation = np.array([892.07, .0, 1170, 0, -np.pi/6, np.pi/4])
+desired_transformation = np.array([585.95, -585.95, 250.97, -np.pi/4, 0, 0])
 
 start_time = time.time()
 
@@ -28,12 +28,12 @@ end_angles, se = ik(desired_transformation=desired_transformation, fk=fk)
 
 while not (ss and se):
   if not ss:
-    lmbd_start += .1
-    start_angles, ss = ik(start_transformation, lmbd=lmbd_start)
+    lmbd_start -= .1
+    start_angles, ss = ik(start_transformation, lmbd=lmbd_start, fk=fk)
 
   if not se:
-    lmbd_end += .1
-    end_angles, se = ik(desired_transformation, lmbd=lmbd_end)
+    lmbd_end -= .1
+    end_angles, se = ik(desired_transformation, lmbd=lmbd_end, fk=fk)
 
 end_time = time.time()
 
