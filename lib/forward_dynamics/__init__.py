@@ -45,7 +45,7 @@ class ForwardDynamics:
       tau_k = sum_a + sum_b + gk
 
       equations.append(
-        sp.Eq(tau, sp.simplify(tau_k))
+        sp.Eq(tau, tau_k)
       )
     
     return equations
