@@ -1,11 +1,9 @@
 import numpy as np
 import sympy as sp
-
 from sympy import cos as c, sin as s, Matrix as M
 
 from lib.forward_kinematics import ForwardKinematic
 from lib.link import Link
-
 
 desired_position = np.array([[797.07], [0], [1170]])
 desired_rotation = np.array([
@@ -14,17 +12,15 @@ desired_rotation = np.array([
   [0, 0, 1]
 ])  # x_y_z_rotation_matrix(0, 0, 0)[:3, :3]
 
-
 np.set_printoptions(suppress=True, precision=3)
-
 
 q1, q2, q3 = sp.symbols('q_1 q_2 q_3')
 
-j0 = Link([q1, 450,  150, sp.pi/2])
-j1 = Link([q2,  0,   720, 0])
-j2 = Link([q3,  0,   647.07, -sp.pi/2])
+j0 = Link([q1, 450, 150, sp.pi / 2])
+j1 = Link([q2, 0, 720, 0])
+j2 = Link([q3, 0, 647.07, -sp.pi / 2])
 
-home_offset = np.array([0, np.pi/2, -np.pi/2])
+home_offset = np.array([0, np.pi / 2, -np.pi / 2])
 fk = ForwardKinematic([j0, j1, j2], offset=home_offset)
 
 htm = fk.get_homogeneous_transformation_matrix()
@@ -63,7 +59,6 @@ while F > err_tolerance:
   theta_k_1 = theta_k - gamma * (J_k.T @ G)
   theta_k = theta_k_1
 
-
 theta_i = theta_k[:, 0] + home_offset
 oc = P(theta_i)[:, 0]
 
@@ -80,15 +75,15 @@ R36 = R03(theta_i).T @ desired_rotation
 q4, q5, q6 = sp.symbols('q_4 q_5 q_6')
 
 _R36 = M([
-  [c(q4)*c(q5)*c(q6) - s(q4)*s(q6), -c(q4)*c(q5)*c(q6) - s(q4)*c(q6), c(q4)*s(q5)],
-  [s(q4)*c(q5)*c(q6) + c(q4)*s(q6), -s(q4)*c(q5)*s(q6) + c(q4)*c(q6), s(q4)*s(q5)],
-  [-s(q5)*c(q6), s(q5)*s(q6), c(q5)],
+  [c(q4) * c(q5) * c(q6) - s(q4) * s(q6), -c(q4) * c(q5) * c(q6) - s(q4) * c(q6), c(q4) * s(q5)],
+  [s(q4) * c(q5) * c(q6) + c(q4) * s(q6), -s(q4) * c(q5) * s(q6) + c(q4) * c(q6), s(q4) * s(q5)],
+  [-s(q5) * c(q6), s(q5) * s(q6), c(q5)],
 ])
 
 EQS = [
-  sp.Eq(c(q5 + np.pi/2), R36[2, 2]),
-  sp.Eq(-s(q4)*s(q5 + np.pi/2), R36[1, 2]),
-  sp.Eq(-s(q5 + np.pi/2)*s(q6 - np.pi/2), R36[2, 1]),
+  sp.Eq(c(q5 + np.pi / 2), R36[2, 2]),
+  sp.Eq(-s(q4) * s(q5 + np.pi / 2), R36[1, 2]),
+  sp.Eq(-s(q5 + np.pi / 2) * s(q6 - np.pi / 2), R36[2, 1]),
 ]
 
 # solving for q5

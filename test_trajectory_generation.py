@@ -1,12 +1,13 @@
 #  Copyright (c) Miguel L. Rodrigues 2022.
 
-import matplotlib.pyplot as plt
-import numpy as np
 import time
 
-from lib.trajectory import Trajectory
-from lib.inverse_velocity_kinematics import ik
+import matplotlib.pyplot as plt
+import numpy as np
+
 from comau import comau_fk as fk
+from lib.inverse_velocity_kinematics import ik
+from lib.trajectory import Trajectory
 
 plt.style.use([
   'science',
@@ -14,12 +15,11 @@ plt.style.use([
   'grid',
 ])
 
-
 lmbd_start = .1
 lmbd_end = .1
 
-start_transformation = np.array([892.07, .0, 1170, 0, -np.pi/6, np.pi/4])
-desired_transformation = np.array([585.95, -585.95, 250.97, -np.pi/4, 0, 0])
+start_transformation = np.array([892.07, .0, 1170, 0, -np.pi / 6, np.pi / 4])
+desired_transformation = np.array([585.95, -585.95, 250.97, -np.pi / 4, 0, 0])
 
 start_time = time.time()
 

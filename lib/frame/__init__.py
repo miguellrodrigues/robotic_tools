@@ -83,9 +83,11 @@ class Frame:
     return self.orientation
 
   def rotation_to(self, other):
-    yaw = sp.atan2(other.orientation[2, 1], other.orientation[2, 2]) - sp.atan2(self.orientation[2, 1], self.orientation[2, 2])
+    yaw = sp.atan2(other.orientation[2, 1], other.orientation[2, 2]) - sp.atan2(self.orientation[2, 1],
+                                                                                self.orientation[2, 2])
     pitch = sp.atan2(other.orientation[2, 0], other.orientation[2, 2]) - sp.atan2(self.orientation[2, 0],
                                                                                   self.orientation[2, 2])
-    roll = sp.atan2(other.orientation[1, 0], other.orientation[0, 0]) - sp.atan2(self.orientation[1, 0], self.orientation[0, 0])
+    roll = sp.atan2(other.orientation[1, 0], other.orientation[0, 0]) - sp.atan2(self.orientation[1, 0],
+                                                                                 self.orientation[0, 0])
 
     return sp.Matrix([yaw, pitch, roll])

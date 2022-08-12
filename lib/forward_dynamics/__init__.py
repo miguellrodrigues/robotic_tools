@@ -1,4 +1,5 @@
 import sympy as sp
+
 from lib.symbols import g, t
 
 
@@ -47,7 +48,7 @@ class ForwardDynamics:
       equations.append(
         sp.Eq(tau, tau_k)
       )
-    
+
     return equations
 
   def get_inertia_matrix_and_potential_energy(self):
@@ -74,4 +75,3 @@ class ForwardDynamics:
       potential_energy += m * G.T @ r
 
     return D, potential_energy[0]
-

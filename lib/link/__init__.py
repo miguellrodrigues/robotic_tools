@@ -3,13 +3,13 @@ from lib.utils import compute_link_transformation
 
 class Link:
   def __init__(
-      self,
-      dhp=None,
-      generalized_coordinate=None,
-      mass=None,
-      transformation_matrix=None,
-      inertia_tensor=None,
-      link_type='R'
+    self,
+    dhp=None,
+    generalized_coordinate=None,
+    mass=None,
+    transformation_matrix=None,
+    inertia_tensor=None,
+    link_type='R'
   ):
     self.dhp = dhp
     self.generalized_coordinate = generalized_coordinate
