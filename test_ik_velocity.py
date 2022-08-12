@@ -4,7 +4,7 @@ from comau import comau_fk as fk
 
 np.set_printoptions(suppress=True, precision=6)
 
-desired_transformation = np.array([797.07, .0, 1075, np.pi/4, -np.pi/6, 0])
+desired_transformation = np.array([797.07, .0, 1075, np.pi/4, -np.pi/6, np.pi/4])
 
 thetas, desired_pose, err = ik(
   desired_transformation=desired_transformation,
@@ -13,7 +13,7 @@ thetas, desired_pose, err = ik(
 )
 
 print(' ')
-print('Found thetas:', np.rad2deg(thetas))
+print('Found thetas:', np.rad2deg(thetas + fk.offset))
 print('Success:', err)
 print(' ')
 

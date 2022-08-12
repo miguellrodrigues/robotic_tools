@@ -67,4 +67,6 @@ def ik(
     if verbose:
       print(f'Iteration {i}, s = {s}')
 
-  return theta_i - fk.offset, desired_pose, not error
+  # Use theta_i + fk.offset in external applications
+  # For calculations using this bib, use theta_i with the offset
+  return theta_i, desired_pose, not error
