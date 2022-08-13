@@ -41,8 +41,9 @@ def ik_position(
 
     J_k = fk.compute_jacobian(theta_i)[3:, :]
 
-    theta_i1 = theta_i - lmbd * (np.linalg.pinv(J_k) @ G)[:, 0]
-    theta_i = theta_i1
+    theta_i -= lmbd * (np.linalg.pinv(J_k) @ G)[:, 0]
+
+    i += 1
 
     if verbose:
       print(f'Iteration {i}, F = {F}')
@@ -81,12 +82,21 @@ def ik(
   # rx, ry, rz: orientation of the end effector
   # returns: the joint angles
 
-  # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame
-
-  n = fk.len_links
+  # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
   if initial_guess is None:
-    initial_guess = np.array([.0 for _ in range(n)])
+    # do ik for position
+    theta_pos, _, _ = ik_position(
+      desired_position=desired_transformation[:3],
+      fk=fk,
+      initial_guess=initial_guess,
+      f_tolerance=epsilon_vb,
+      max_iterations=max_iterations,
+      lmbd=lmbd,
+      verbose=verbose
+    )
+
+    initial_guess = theta_pos
 
   desired_rotation = x_y_z_rotation_matrix(desired_transformation[3], desired_transformation[4],
                                            desired_transformation[5])
@@ -110,7 +120,7 @@ def ik(
 
     J = fk.compute_jacobian(theta_i)
 
-    d_theta = np.linalg.pinv(J.T @ J) @ J.T @ s
+    d_theta = np.linalg.pinv(J) @ s
     theta_i += (lmbd * d_theta)
 
     wb_err = np.linalg.norm(s[:3])
