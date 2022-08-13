@@ -7,7 +7,7 @@ from lib.inverse_velocity_kinematics import ik
 
 np.set_printoptions(suppress=True, precision=6)
 
-desired_transformation = np.array([585.95, -585.95, 250.97, 0, 0, np.pi])
+desired_transformation = np.array([585.95, 585.95, 250.97, np.pi/6, np.pi/6, 0])
 
 start_time = time.time()
 
