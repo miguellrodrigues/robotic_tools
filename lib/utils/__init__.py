@@ -149,20 +149,3 @@ def compute_homogeneous_transformation(links, start, end):
     transformation_matrix = transformation_matrix @ transformation_matrix_i
 
   return transformation_matrix
-
-
-def normalize_angle_between_limits(angle, lower_limit, upper_limit):
-  """
-    Normalizes an angle between a lower and upper limit
-  :param angle: The angle to normalize
-  :param lower_limit: The lower limit of the angle
-  :param upper_limit: The upper limit of the angle
-  :return: The normalized angle
-  """
-
-  while angle > upper_limit:
-    angle -= 2 * np.pi
-  while angle < lower_limit:
-    angle += 2 * np.pi
-
-  return angle

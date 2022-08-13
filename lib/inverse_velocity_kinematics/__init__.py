@@ -5,7 +5,7 @@ import sympy as sp
 
 from lib.forward_kinematics import ForwardKinematic
 from lib.frame import x_y_z_rotation_matrix, translation_matrix
-from lib.utils import matrix_log6, inverse_transformation, se3_to_vec, normalize_angle_between_limits
+from lib.utils import matrix_log6, inverse_transformation, se3_to_vec
 
 
 def ik_position(
@@ -15,7 +15,7 @@ def ik_position(
   f_tolerance=1e-7,
   max_iterations=1500,
   lmbd=.1,
-  verbose=False,
+  verbose=False
 ):
   desired_position = np.array([
     [desired_position[0]],
@@ -59,12 +59,13 @@ def ik(
   desired_transformation=None,
   fk: ForwardKinematic = None,
   initial_guess=None,
-  epsilon_wb=1e-7,
-  epsilon_vb=1e-7,
+  epsilon_wb=1e-6,
+  epsilon_vb=1e-6,
   max_iterations=1500,
   lmbd=.1,
   verbose=False,
-  only_position=False):
+  only_position=False,
+  normalize=False):
 
   if only_position:
     return ik_position(
@@ -139,7 +140,8 @@ def ik(
   if error and success_pos:
     theta_i = theta_pos
 
-  for i in range(len(theta_i)):
-    theta_i[i] = theta_i[i] % (2 * np.pi)
+  if normalize:
+    for i in range(len(theta_i)):
+      theta_i[i] = theta_i[i] % (2 * np.pi)
 
   return theta_i, desired_pose, 'Full' if not error else 'Partial' if success_pos else 'None'

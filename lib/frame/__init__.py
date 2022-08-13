@@ -46,6 +46,10 @@ def arbitrary_vector_rotation_matrix(theta, v):
   return sp.eye(4) + sp.sin(theta) * v + (1 - sp.cos(theta)) * v ** 2
 
 
+def zyz(phi, theta, psi):
+  return z_rotation_matrix(phi) @ y_rotation_matrix(theta) @ z_rotation_matrix(psi)
+
+
 def translation_matrix(dx, dy, dz):
   return sp.Matrix([
     [1, 0, 0, dx],
