@@ -51,7 +51,7 @@ def ik_position(
   error = F > f_tolerance
 
   # Use theta_i + fk.offset in external applications
-  # For calculations using this bib, use theta_i with the offset
+  # For calculations using this lib, use theta_i with the offset
   return theta_i, desired_position, not error
 
 
@@ -65,7 +65,6 @@ def ik(
   lmbd=.1,
   verbose=False,
   only_position=False):
-
   if only_position:
     return ik_position(
       desired_position=desired_transformation[:3],
@@ -134,5 +133,8 @@ def ik(
       print(f'Iteration {i}, s = {s}')
 
   # Use theta_i + fk.offset in external applications
-  # For calculations using this bib, use theta_i with the offset
+  # For calculations using this lib, use theta_i with the offset
+  if error:
+    theta_i = initial_guess
+
   return theta_i, desired_pose, not error

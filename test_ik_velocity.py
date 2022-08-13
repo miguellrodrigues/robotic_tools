@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from comau import comau_fk as fk
@@ -5,7 +7,9 @@ from lib.inverse_velocity_kinematics import ik
 
 np.set_printoptions(suppress=True, precision=6)
 
-desired_transformation = np.array([297.07, .0, 1165, np.pi / 6, -np.pi / 6, -np.pi/4])
+desired_transformation = np.array([897.07, .0, 1265, np.pi / 6, np.pi / 6, -np.pi / 6])
+
+start_time = time.time()
 
 thetas, desired_pose, err = ik(
   desired_transformation=desired_transformation,
@@ -14,6 +18,12 @@ thetas, desired_pose, err = ik(
   lmbd=.1,
   only_position=False
 )
+
+end_time = time.time()
+
+print(' ')
+print('Time elapsed:', end_time - start_time)
+print(' ')
 
 print(' ')
 print('Found thetas:', np.rad2deg(thetas + fk.offset))

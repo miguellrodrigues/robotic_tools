@@ -120,13 +120,13 @@ def matrix_log6(T):
   _, l3 = matrix_log3(R)
 
   if np.array_equal(l3, np.zeros((3, 3))):
-    return np.r_[np.c_[np.zeros((3, 3)), [T[0][3], T[1][3], T[2][3]]], [[0, 0, 0, 0]]]
+    return np.r_[np.c_[np.zeros((3, 3)), p], [[0, 0, 0, 0]]]
   else:
     theta = np.arccos((np.trace(R) - 1) / 2.0)
 
     return np.r_[np.c_[l3, np.dot(
       np.eye(3) - l3 / 2.0 + (1.0 / theta - 1.0 / np.tan(theta / 2.0) / 2) * np.dot(l3, l3) / theta,
-      [T[0][3], T[1][3], T[2][3]])], [[0, 0, 0, 0]]]
+      p)], [[0, 0, 0, 0]]]
 
 
 def compute_link_transformation(dhp):
