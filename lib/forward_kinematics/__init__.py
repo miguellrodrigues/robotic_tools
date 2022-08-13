@@ -5,9 +5,11 @@ from lib.utils import compute_homogeneous_transformation
 
 
 class ForwardKinematic:
-  def __init__(self, links):
+  def __init__(self, links, offset=None):
     self.links = links
     self.len_links = len(self.links)
+    self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
+    self.offset = offset
 
     self.links_zero_i = []
 
@@ -28,25 +30,56 @@ class ForwardKinematic:
         Link(
           generalized_coordinate=self.links[i - 1].dhp[0],
           mass=m,
-          transformation_matrix=sp.simplify(transformation),
+          transformation_matrix=transformation,
           inertia_tensor=I,
         )
       )
 
-    self.homogeneous_transformation_matrix = sp.simplify(
-      self.get_transformation(0, self.len_links)
+    self.ee_transformation_matrix = self.get_transformation(0, self.len_links)
+    self.jacobian = self.get_jacobian()
+
+    self.lambdify_jacobian = sp.lambdify(
+      [self.generalized_coordinates],
+      self.jacobian,
+      modules=['numpy'],
     )
 
-    self.jacobian = sp.simplify(
-      self.get_jacobian()
+    self.lambdify_ee_transformation_matrix = sp.lambdify(
+      [self.generalized_coordinates],
+      self.ee_transformation_matrix,
+      modules=['numpy'],
+    )
+
+    self.lambdify_ee_position = sp.lambdify(
+      [self.generalized_coordinates],
+      self.ee_transformation_matrix[:3, 3],
+      modules=['numpy'],
+    )
+
+    self.lambdify_ee_orientation = sp.lambdify(
+      [self.generalized_coordinates],
+      self.ee_transformation_matrix[:3, :3],
+      modules=['numpy'],
     )
 
   def get_transformation(self, start, end):
     tf = compute_homogeneous_transformation(self.links, start, end)
     return tf
 
-  def get_homogeneous_transformation_matrix(self):
-    return self.homogeneous_transformation_matrix
+  def get_ee_transformation_matrix(self):
+    return self.ee_transformation_matrix
+
+  def compute_jacobian(self, q):
+    return self.lambdify_jacobian(q + self.offset)
+
+  def compute_ee_transformation_matrix(self, q):
+    return self.lambdify_ee_transformation_matrix(q + self.offset)
+
+  def compute_ee_position(self, q):
+    return self.lambdify_ee_position(q + self.offset)
+
+  def compute_ee_orientation(self, q):
+    return self.lambdify_ee_orientation(q + self.offset)
 
   def get_spacial_jacobian(self):
     return self.jacobian[:3, :]
@@ -55,7 +88,7 @@ class ForwardKinematic:
     return self.jacobian[3:, :]
 
   def get_jacobian(self):
-    htm = self.homogeneous_transformation_matrix
+    htm = self.ee_transformation_matrix
 
     j = sp.zeros(6, self.len_links)
 
@@ -77,7 +110,7 @@ class ForwardKinematic:
         J_vi = z_i.cross(p_diff)
         J_wi = z_i
 
-      J = sp.Matrix([J_vi, J_wi])
+      J = sp.Matrix([J_wi, J_vi])
       j[:, i] = J
 
       transformation = self.links_zero_i[i].transformation_matrix
