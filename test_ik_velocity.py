@@ -22,7 +22,7 @@ thetas, desired_pose, err = ik(
 end_time = time.time()
 
 print(' ')
-print('Time elapsed:', end_time - start_time)
+print('Elapsed time:', end_time - start_time)
 print(' ')
 
 print(' ')
