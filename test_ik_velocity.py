@@ -5,13 +5,14 @@ from lib.inverse_velocity_kinematics import ik
 
 np.set_printoptions(suppress=True, precision=6)
 
-desired_transformation = np.array([797.07, .0, 1075, np.pi / 6, np.pi / 6, 0])
+desired_transformation = np.array([797.07, .0, 1165, np.pi / 6, np.pi / 6, 0])
 
 thetas, desired_pose, err = ik(
   desired_transformation=desired_transformation,
   fk=fk,
-  verbose=False,
-  lmbd=.1
+  verbose=True,
+  lmbd=1,
+  only_position=True
 )
 
 print(' ')
@@ -21,5 +22,5 @@ print(' ')
 
 print('Desired pose:\n', desired_pose)
 print(' ')
-print('Found pose:\n', fk.compute_homogeneous_transformation_matrix(thetas))
+print('Found pose:\n', fk.compute_ee_transformation_matrix(thetas))
 print(' ')

@@ -45,9 +45,9 @@ print(f'Start angles: {np.rad2deg(start_angles)}')
 print(f'End angles: {np.rad2deg(end_angles)}')
 
 print(' ')
-print('Start transformation:\n', fk.compute_homogeneous_transformation_matrix(start_angles))
+print('Start transformation:\n', fk.compute_ee_transformation_matrix(start_angles))
 print(' ')
-print('End transformation:\n', fk.compute_homogeneous_transformation_matrix(end_angles))
+print('End transformation:\n', fk.compute_ee_transformation_matrix(end_angles))
 print(' ')
 
 start_velocity = np.zeros(6)

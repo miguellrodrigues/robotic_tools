@@ -35,7 +35,7 @@ class ForwardKinematic:
         )
       )
 
-    self.homogeneous_transformation_matrix = self.get_transformation(0, self.len_links)
+    self.ee_transformation_matrix = self.get_transformation(0, self.len_links)
     self.jacobian = self.get_jacobian()
 
     self.lambdify_jacobian = sp.lambdify(
@@ -44,9 +44,21 @@ class ForwardKinematic:
       modules=['numpy'],
     )
 
-    self.lambdify_htm = sp.lambdify(
+    self.lambdify_ee_transformation_matrix = sp.lambdify(
       [self.generalized_coordinates],
-      self.homogeneous_transformation_matrix,
+      self.ee_transformation_matrix,
+      modules=['numpy'],
+    )
+
+    self.lambdify_ee_position = sp.lambdify(
+      [self.generalized_coordinates],
+      self.ee_transformation_matrix[:3, 3],
+      modules=['numpy'],
+    )
+
+    self.lambdify_ee_orientation = sp.lambdify(
+      [self.generalized_coordinates],
+      self.ee_transformation_matrix[:3, :3],
       modules=['numpy'],
     )
 
@@ -54,14 +66,20 @@ class ForwardKinematic:
     tf = compute_homogeneous_transformation(self.links, start, end)
     return tf
 
-  def get_homogeneous_transformation_matrix(self):
-    return self.homogeneous_transformation_matrix
+  def get_ee_transformation_matrix(self):
+    return self.ee_transformation_matrix
 
   def compute_jacobian(self, q):
     return self.lambdify_jacobian(q + self.offset)
 
-  def compute_homogeneous_transformation_matrix(self, q):
-    return self.lambdify_htm(q + self.offset)
+  def compute_ee_transformation_matrix(self, q):
+    return self.lambdify_ee_transformation_matrix(q + self.offset)
+
+  def compute_ee_position(self, q):
+    return self.lambdify_ee_position(q + self.offset)
+
+  def compute_ee_orientation(self, q):
+    return self.lambdify_ee_orientation(q + self.offset)
 
   def get_spacial_jacobian(self):
     return self.jacobian[:3, :]
@@ -70,7 +88,7 @@ class ForwardKinematic:
     return self.jacobian[3:, :]
 
   def get_jacobian(self):
-    htm = self.homogeneous_transformation_matrix
+    htm = self.ee_transformation_matrix
 
     j = sp.zeros(6, self.len_links)
 

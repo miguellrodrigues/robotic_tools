@@ -8,6 +8,52 @@ from lib.frame import x_y_z_rotation_matrix, translation_matrix
 from lib.utils import matrix_log6, inverse_transformation, se3_to_vec
 
 
+def ik_position(
+  desired_position=None,
+  fk: ForwardKinematic = None,
+  initial_guess=None,
+  f_tolerance=1e-7,
+  max_iterations=1500,
+  lmbd=.1,
+  verbose=False,
+):
+  desired_position = np.array([
+    [desired_position[0]],
+    [desired_position[1]],
+    [desired_position[2]]
+  ])
+
+  n = fk.len_links
+
+  if initial_guess is None:
+    initial_guess = np.array([.0 for _ in range(n)])
+
+  theta_i = initial_guess
+
+  F = f_tolerance + 1
+  i = 0
+
+  while F > f_tolerance and i < max_iterations:
+    P_i = fk.compute_ee_position(theta_i)
+    G = P_i - desired_position
+
+    F = .5 * G.T @ G
+
+    J_k = fk.compute_jacobian(theta_i)[3:, :]
+
+    theta_i1 = theta_i - lmbd * (np.linalg.pinv(J_k) @ G)[:, 0]
+    theta_i = theta_i1
+
+    if verbose:
+      print(f'Iteration {i}, F = {F}')
+
+  error = F > f_tolerance
+
+  # Use theta_i + fk.offset in external applications
+  # For calculations using this bib, use theta_i with the offset
+  return theta_i, desired_position, not error
+
+
 def ik(
   desired_transformation=None,
   fk: ForwardKinematic = None,
@@ -16,7 +62,20 @@ def ik(
   epsilon_vb=1e-7,
   max_iterations=1500,
   lmbd=.1,
-  verbose=False):
+  verbose=False,
+  only_position=False):
+
+  if only_position:
+    return ik_position(
+      desired_position=desired_transformation[:3],
+      fk=fk,
+      initial_guess=initial_guess,
+      f_tolerance=epsilon_vb,
+      max_iterations=max_iterations,
+      lmbd=lmbd,
+      verbose=verbose
+    )
+
   # transformation_data = [x, y, z, rx, ry, rz]
   # x, y, z: position of the end effector
   # rx, ry, rz: orientation of the end effector
@@ -41,7 +100,7 @@ def ik(
   i = 0
 
   while error and i < max_iterations:
-    htm = fk.compute_homogeneous_transformation_matrix(theta_i)
+    htm = fk.compute_ee_transformation_matrix(theta_i)
     i_htm = inverse_transformation(htm)
 
     Tbd = i_htm @ desired_pose
@@ -51,7 +110,7 @@ def ik(
 
     J = fk.compute_jacobian(theta_i)
 
-    d_theta = np.linalg.pinv(J) @ s
+    d_theta = np.linalg.pinv(J.T @ J) @ J.T @ s
     theta_i += (lmbd * d_theta)
 
     wb_err = np.linalg.norm(s[:3])
