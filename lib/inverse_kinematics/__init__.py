@@ -59,31 +59,13 @@ def ik(
   desired_transformation=None,
   fk: ForwardKinematic = None,
   initial_guess=None,
-  epsilon_wb=1e-6,
-  epsilon_vb=1e-6,
+  epsilon_wb=1e-7,
+  epsilon_vb=1e-7,
   max_iterations=1500,
   lmbd=.1,
   verbose=False,
   only_position=False,
   normalize=False):
-
-  if only_position:
-    return ik_position(
-      desired_position=desired_transformation[:3],
-      fk=fk,
-      initial_guess=initial_guess,
-      f_tolerance=epsilon_vb,
-      max_iterations=max_iterations,
-      lmbd=lmbd,
-      verbose=verbose
-    )
-
-  # transformation_data = [x, y, z, rx, ry, rz]
-  # x, y, z: position of the end effector
-  # rx, ry, rz: orientation of the end effector
-  # returns: the joint angles
-
-  # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
   # finding the thetas only for the position
   theta_pos, _, success_pos = ik_position(
@@ -95,6 +77,16 @@ def ik(
     lmbd=lmbd,
     verbose=verbose
   )
+
+  if only_position:
+    return theta_pos, _, success_pos
+
+  # transformation_data = [x, y, z, rx, ry, rz]
+  # x, y, z: position of the end effector
+  # rx, ry, rz: orientation of the end effector
+  # returns: the joint angles
+
+  # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
   if initial_guess is None:
     initial_guess = theta_pos
