@@ -113,5 +113,5 @@ axs[1].set_ylabel(r'$\dot{\theta(t)}$')
 axs[2].set_xlabel('t (s)')
 axs[2].set_ylabel(r'$\ddot{\theta(t)}$')
 
-plt.savefig('trajectories.png', dpi=300)
+plt.savefig('images/trajectories.png', dpi=300)
 plt.show()
