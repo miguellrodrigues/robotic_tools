@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 
-from comau import comau_fk as fk
+from robots.comau import comau_fk as fk
 from lib.inverse_kinematics import ik
 
 
@@ -17,7 +17,7 @@ thetas, desired_pose, err = ik(
   fk=fk,
   verbose=False,
   lmbd=.1,
-  only_position=False,
+  only_position=True,
 )
 
 

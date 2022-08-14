@@ -5,7 +5,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
-from comau import comau_fk as fk
+from robots.comau import comau_fk as fk
 from lib.inverse_kinematics import ik
 from lib.trajectory import Trajectory
 
