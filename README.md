@@ -12,6 +12,8 @@ in order to use the forward kinematics, you gonna need the robot DH parameters. 
 u can create a 'Link' object representation for each link, using the parameters.
 
 ```python
+from lib.link import Link
+
 L0 = Link([θ1, d1, a1, α1])
 L1 = Link([θ2, d2, a2, α2])
 L2 = Link([θ3, d3, a3, α3])
@@ -21,6 +23,8 @@ Finally create an instance of the ForwardKinematic class, and pass a list with
 all links in the constructor. You can also pass an offset with the angles of home position.
 
 ```python
+from lib.forward_kinematics import ForwardKinematic
+
 fk = ForwardKinematic([L0, L1, L2], offset=np.array([.0, .0, .0]))
 ```
 
@@ -82,4 +86,22 @@ thetas, _, success = ik(
     only_position=False,
     normalize=False
 )
+```
+## Forward Dynamics
+
+In order to compute the ForwardDynamics u first need the ForwardKinematic of the robot.
+When u instantiate the ForwardDynamic class, it will start to calculate the equations of motion (resulting torque's)
+in each link, so it can take a long time if you use the simplify method of sympy library.
+
+```python
+import sympy as sp
+from lib.forward_dynamics import ForwardDynamic
+
+fd = ForwardDynamic(fk)
+
+for eq in fd.equations:
+    print(' ')
+    sp.print_latex(sp.simplify(eq))
+    print(' ')
+
 ```
