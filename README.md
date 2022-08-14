@@ -63,6 +63,8 @@ thetas, _, success = ik_position(
 )
 ```
 
+![position ik](images/partial_ik.png)
+
 ### Inverse Kinematics of Position and Orientation
 
 The inverse kinematics of position and orientation uses the jacobian matrix and end-effector velocities
@@ -90,6 +92,9 @@ thetas, _, success = ik(
     normalize=False
 )
 ```
+
+![position ik](images/full_ik.png)
+
 ## Forward Dynamics
 
 In order to compute the ForwardDynamics u first need the ForwardKinematic of the robot.
