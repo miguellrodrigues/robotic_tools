@@ -63,6 +63,7 @@ thetas, _, success = ik_position(
 )
 ```
 
+Output example of the inverse kinematics of position:
 ![position ik](images/partial_ik.png)
 
 ### Inverse Kinematics of Position and Orientation
@@ -92,7 +93,7 @@ thetas, _, success = ik(
     normalize=False
 )
 ```
-
+Output example for the inverse kinematics of position and orientation
 ![position ik](images/full_ik.png)
 
 ## Forward Dynamics
