@@ -12,11 +12,14 @@ in order to use the forward kinematics, you gonna need the robot DH parameters. 
 u can create a 'Link' object representation for each link, using the parameters.
 
 ```python
+import sympy as sp
 from lib.link import Link
 
-L0 = Link([θ1, d1, a1, α1])
-L1 = Link([θ2, d2, a2, α2])
-L2 = Link([θ3, d3, a3, α3])
+q1, q2, q3 = sp.symbols('q_1 q_2 q_3')
+
+j0 = Link([q1, 450, 150, sp.pi / 2])
+j1 = Link([q2, 0, 590, 0])
+j2 = Link([q3, 0, 130, sp.pi / 2])
 ```
 
 Finally create an instance of the ForwardKinematic class, and pass a list with
@@ -25,7 +28,7 @@ all links in the constructor. You can also pass an offset with the angles of hom
 ```python
 from lib.forward_kinematics import ForwardKinematic
 
-fk = ForwardKinematic([L0, L1, L2], offset=np.array([.0, .0, .0]))
+fk = ForwardKinematic([j0, j1, j2], offset=np.array([.0, .0, .0]))
 ```
 
 The ForwardKinematic class contains the symbolic matrices of transformations, like transformations
