@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 from comau import comau_fk as fk
-from lib.inverse_velocity_kinematics import ik
+from lib.inverse_kinematics import ik
 
 
 np.set_printoptions(suppress=True, precision=5)

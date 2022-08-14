@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from comau import comau_fk as fk
-from lib.inverse_velocity_kinematics import ik
+from lib.inverse_kinematics import ik
 from lib.trajectory import Trajectory
 
 np.set_printoptions(suppress=True, precision=6)
