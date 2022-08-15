@@ -130,6 +130,6 @@ for eq in fd.equations:
   print(' ')
 ```
 
-Example of forward dynamics equation of an RR planar robot
+Example of forward dynamic equations of an RR planar robot
 ![tau 1](images/tau1.png)
 ![tau 2](images/tau2.png)
