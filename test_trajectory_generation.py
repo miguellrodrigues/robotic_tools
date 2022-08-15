@@ -5,9 +5,9 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
-from robots.comau import comau_fk as fk
 from lib.inverse_kinematics import ik
 from lib.trajectory import Trajectory
+from robots.comau import comau_fk as fk
 
 np.set_printoptions(suppress=True, precision=6)
 

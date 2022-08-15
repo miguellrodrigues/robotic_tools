@@ -66,7 +66,6 @@ def ik(
   verbose=False,
   only_position=False,
   normalize=False):
-
   # finding the thetas only for the position
   theta_pos, _, success_pos = ik_position(
     desired_position=desired_transformation[:3],

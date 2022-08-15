@@ -1,20 +1,22 @@
 import numpy as np
 import sympy as sp
+
 from lib.frame import z_rotation_matrix, translation_matrix, x_rotation_matrix
 
 
-def near_zero(s):
+def near_zero(s, epsilon=1e-6):
   """
     Returns True if the value is small enough to be considered zero.
 
   :param s: The value to check.
+  :param epsilon: The threshold.
   """
-  return np.abs(s) < 1e-6
+  return np.abs(s) < epsilon
 
 
 def vec_to_so3(v):
   """
-    Converts a 3-vector to an so(3) representation
+    Converts a 3-vector to a so(3) representation
   :param v: A 3-vector
   :return: The skew symmetric representation of v
   """

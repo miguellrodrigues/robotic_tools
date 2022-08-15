@@ -1,7 +1,7 @@
-from robots.RR import rr_fk as fk
-from lib.forward_dynamics import ForwardDynamics
 import sympy as sp
 
+from lib.forward_dynamics import ForwardDynamics
+from robots.RR import rr_fk as fk
 
 fd = ForwardDynamics(fk)
 for eq in fd.equations:

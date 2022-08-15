@@ -2,9 +2,8 @@ import time
 
 import numpy as np
 
-from robots.comau import comau_fk as fk
 from lib.inverse_kinematics import ik
-
+from robots.comau import comau_fk as fk
 
 np.set_printoptions(suppress=True, precision=5)
 
@@ -21,7 +20,6 @@ thetas, desired_pose, err = ik(
   lmbd=.1,
   only_position=False,
 )
-
 
 end_time = time.time()
 

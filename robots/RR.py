@@ -1,10 +1,10 @@
 # 2R Planar Robot
 
-from lib.symbols import t
 import sympy as sp
 
 from lib.forward_kinematics import ForwardKinematic
 from lib.link import Link
+from lib.symbols import t
 
 # To use the forward dynamics, the q's need to be functions of time
 

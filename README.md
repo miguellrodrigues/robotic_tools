@@ -1,4 +1,3 @@
-
 # Robotic Tools
 
 Robotic tools is a library made to make some calculations easier, like robots forward
@@ -32,7 +31,9 @@ fk = ForwardKinematic([j0, j1, j2], offset=np.array([.0, .0, .0]))
 ```
 
 The ForwardKinematic class contains the symbolic matrices of transformations, like transformations
-from the reference frame to the i-th frame, the end-effector transformation matrix, the jacobian matrix, and other things.
+from the reference frame to the i-th frame, the end-effector transformation matrix, the jacobian matrix, and other
+things.
+
 ## Inverse Kinematics
 
 To use the inverse kinematics u need first to have the ForwardKinematic of the robot
@@ -53,13 +54,13 @@ from lib.inverse_kinematics import ik_position
 desired_position = np.array([.1, .4, .0])
 
 thetas, _, success = ik_position(
-    desired_position=desired_position,
-    fk=fk,
-    initial_guess=np.array([.2, .7, -.1]),
-    f_tolerance=1e-5,
-    max_iterations=1000,
-    lmbd=.1,
-    verbose=True
+  desired_position=desired_position,
+  fk=fk,
+  initial_guess=np.array([.2, .7, -.1]),
+  f_tolerance=1e-5,
+  max_iterations=1000,
+  lmbd=.1,
+  verbose=True
 )
 ```
 
@@ -70,7 +71,7 @@ Output example of the inverse kinematics of position:
 
 The inverse kinematics of position and orientation uses the jacobian matrix and end-effector velocities
 necessary to achive an wanted transformation. This method is also called inverse velocity kinematics. The
-end-effector velocities mentioned before are calculated using the methods explained in 
+end-effector velocities mentioned before are calculated using the methods explained in
 Modern Robotics Book (http://hades.mech.northwestern.edu/index.php/Modern_Robotics).
 
 ```python
@@ -78,21 +79,22 @@ import numpy as np
 from lib.inverse_kinematics import ik
 
 # Px, Py, Pz, Rx, Ry, Rz
-desired_transformation = np.array([.1, .4, .0, 0, np.pi/4, 0])
+desired_transformation = np.array([.1, .4, .0, 0, np.pi / 4, 0])
 
 thetas, _, success = ik(
-    desired_transformation=desired_transformation,
-    fk=fk,
-    initial_guess=np.array([.2, .7, -.1]),
-    epsilon_wb=1e-5,
-    epsilon_vb=1e-5,
-    max_iterations=1000,
-    lmbd=.1,
-    verbose=True,
-    only_position=False,
-    normalize=False
+  desired_transformation=desired_transformation,
+  fk=fk,
+  initial_guess=np.array([.2, .7, -.1]),
+  epsilon_wb=1e-5,
+  epsilon_vb=1e-5,
+  max_iterations=1000,
+  lmbd=.1,
+  verbose=True,
+  only_position=False,
+  normalize=False
 )
 ```
+
 Output example for the inverse kinematics of position and orientation
 ![position ik](images/full_ik.png)
 
