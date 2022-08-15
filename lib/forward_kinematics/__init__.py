@@ -1,3 +1,4 @@
+import numpy as np
 import sympy as sp
 
 from lib.link import Link
@@ -11,11 +12,13 @@ class ForwardKinematic:
     self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
     self.offset = offset
 
-    self.links_zero_i = []
+    if offset is None:
+      self.offset = np.zeros(self.len_links)
+
+    self.links_zero_i = np.empty(self.len_links, dtype=Link)
 
     for i in range(1, self.len_links + 1):
       m = sp.Symbol(f'm_{i}')
-      # I = sp.symarray(f'I({i})', (3, 3))
 
       I = sp.Matrix([
         [sp.Symbol(f'I_{i}(xx)'), sp.Symbol(f'I_{i}(xy)'), sp.Symbol(f'I_{i}(xz)')],
@@ -26,13 +29,11 @@ class ForwardKinematic:
       transformation = self.get_transformation(0, i)
       # I = R @ I @ R.T
 
-      self.links_zero_i.append(
-        Link(
-          generalized_coordinate=self.links[i - 1].dhp[0],
-          mass=m,
-          transformation_matrix=transformation,
-          inertia_tensor=I,
-        )
+      self.links_zero_i[i - 1] = Link(
+        generalized_coordinate=self.links[i - 1].dhp[0],
+        mass=m,
+        transformation_matrix=transformation,
+        inertia_tensor=I,
       )
 
     self.ee_transformation_matrix = self.get_transformation(0, self.len_links)

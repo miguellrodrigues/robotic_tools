@@ -5,7 +5,7 @@ from lib.symbols import g, t
 
 class ForwardDynamics:
   def __init__(self, forward_kinematics):
-    self.jacobian = forward_kinematics.get_jacobian()
+    self.jacobian = forward_kinematics.jacobian
     self.links = forward_kinematics.links_zero_i
 
     self.q = sp.Matrix([link.generalized_coordinate for link in self.links])
@@ -14,7 +14,7 @@ class ForwardDynamics:
 
     self.len_q = len(self.q)
 
-    self.w = self.jacobian[3:, :]
+    self.w = self.jacobian[:3, :]
     self.equations = self.get_system_equations_of_motion()
 
   def get_system_equations_of_motion(self):
@@ -30,17 +30,18 @@ class ForwardDynamics:
       sum_a = 0
       sum_b = 0
 
-      for i in range(self.len_q):
+      for i in range(len(self.links)):
         qi = self.q[i]
 
-        for j in range(self.len_q):
+        for j in range(len(self.links)):
           qj = self.q[j]
-          sum_a += D[k, j] * sp.diff(qj, t, 2)
 
           dkj = D[k, j]
           dij = D[i, j]
 
           aux = (dkj.diff(qi) - sp.Rational(1, 2) * dij.diff(qk)) * self.dq_dt[i] * self.dq_dt[j]
+
+          sum_a += dkj * sp.diff(sp.diff(qj, t), t)
           sum_b += aux
 
       tau_k = sum_a + sum_b + gk
@@ -71,6 +72,7 @@ class ForwardDynamics:
         Jvi[:, j] = dr_dq[j]
 
       Jwi[:, :i + 1] = self.w[:, :i + 1]
+
       D += (m * Jvi.T @ Jvi) + (Jwi.T @ I @ Jwi)
       potential_energy += m * G.T @ r
 

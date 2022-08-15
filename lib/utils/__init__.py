@@ -1,5 +1,5 @@
 import numpy as np
-
+import sympy as sp
 from lib.frame import z_rotation_matrix, translation_matrix, x_rotation_matrix
 
 
@@ -140,7 +140,7 @@ def compute_link_transformation(dhp):
 
 def compute_homogeneous_transformation(links, start, end):
   if end == 0:
-    return np.eye(4)
+    return sp.eye(4)
 
   transformation_matrix = links[start].get_transformation_matrix()
 

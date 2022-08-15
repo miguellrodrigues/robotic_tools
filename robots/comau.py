@@ -6,8 +6,6 @@ import sympy as sp
 from lib.forward_kinematics import ForwardKinematic
 from lib.link import Link
 
-np.set_printoptions(suppress=True, precision=3)
-
 q1, q2, q3, q4, q5, q6 = sp.symbols('q_1 q_2 q_3 q_4 q_5 q_6')
 
 j0 = Link([q1, 450, 150, sp.pi / 2])

@@ -102,15 +102,34 @@ In order to compute the ForwardDynamics u first need the ForwardKinematic of the
 When u instantiate the ForwardDynamic class, it will start to calculate the equations of motion (resulting torque's)
 in each link, so it can take a long time if you use the simplify method of sympy library.
 
+The joint variables (thetas) need to be functions of time.
+
 ```python
+from lib.symbols import t
 import sympy as sp
-from lib.forward_dynamics import ForwardDynamic
 
-fd = ForwardDynamic(fk)
+from lib.forward_kinematics import ForwardKinematic
+from lib.forward_dynamics import ForwardDynamics
+from lib.link import Link
 
+# To use the forward dynamics, the q's need to be functions of time
+
+q1 = sp.Function('q_1')(t)
+q2 = sp.Function('q_2')(t)
+a1, a2 = sp.symbols('a_1 a_2')
+
+j0 = Link([q1, 0, a1, 0])
+j1 = Link([q2, 0, a2, 0])
+
+rr_fk = ForwardKinematic([j0, j1])
+
+fd = ForwardDynamics(fk)
 for eq in fd.equations:
-    print(' ')
-    sp.print_latex(sp.simplify(eq))
-    print(' ')
-
+  print(' ')
+  sp.print_latex(sp.simplify(eq))
+  print(' ')
 ```
+
+Example of forward dynamics equation of an RR planar robot
+![tau 1](images/tau1.png)
+![tau 2](images/tau2.png)
