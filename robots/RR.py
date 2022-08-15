@@ -10,6 +10,7 @@ from lib.symbols import t
 
 q1 = sp.Function('q_1')(t)
 q2 = sp.Function('q_2')(t)
+
 a1, a2 = sp.symbols('a_1 a_2')
 
 j0 = Link([q1, 0, a1, 0])
