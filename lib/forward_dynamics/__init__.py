@@ -41,7 +41,7 @@ class ForwardDynamics:
 
           aux = (dkj.diff(qi) - sp.Rational(1, 2) * dij.diff(qk)) * self.dq_dt[i] * self.dq_dt[j]
 
-          sum_a += dkj * sp.diff(sp.diff(qj, t), t)
+          sum_a += dkj * sp.diff(qj, t, 2)
           sum_b += aux
 
       tau_k = sum_a + sum_b + gk
