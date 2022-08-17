@@ -125,7 +125,7 @@ j1 = Link([q2, 0, a2, 0])
 
 rr_fk = ForwardKinematic([j0, j1])
 
-fd = ForwardDynamics(fk)
+fd = ForwardDynamics(rr_fk)
 for eq in fd.equations:
   print(' ')
   sp.print_latex(sp.simplify(eq))
