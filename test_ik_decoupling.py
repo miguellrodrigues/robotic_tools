@@ -21,7 +21,7 @@ j1 = Link([q2, 0, 720, 0])
 j2 = Link([q3, 0, 647.07, -sp.pi / 2])
 
 home_offset = np.array([0, np.pi / 2, -np.pi / 2])
-fk = ForwardKinematic([j0, j1, j2], offset=home_offset)
+fk = ForwardKinematic([j0, j1, j2], joint_angle_offsets=home_offset)
 
 htm = fk.get_ee_transformation_matrix()
 

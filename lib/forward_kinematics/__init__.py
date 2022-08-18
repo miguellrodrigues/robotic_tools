@@ -6,14 +6,21 @@ from lib.utils import compute_homogeneous_transformation
 
 
 class ForwardKinematic:
-  def __init__(self, links, offset=None):
+  def __init__(self,
+               links,
+               joint_angle_offsets=None,
+               base_frame_transformation_offset=np.eye(4),
+               ee_frame_transformation_offset=np.eye(4)):
     self.links = links
     self.len_links = len(self.links)
     self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
-    self.offset = offset
+    self.joint_angle_offsets = joint_angle_offsets
 
-    if offset is None:
-      self.offset = np.zeros(self.len_links)
+    self.base_frame_transformation_offset = base_frame_transformation_offset
+    self.ee_frame_transformation_offset = ee_frame_transformation_offset
+
+    if joint_angle_offsets is None:
+      self.joint_angle_offsets = np.zeros(self.len_links)
 
     self.links_zero_i = np.empty(self.len_links, dtype=Link)
 
@@ -36,7 +43,12 @@ class ForwardKinematic:
         inertia_tensor=I,
       )
 
-    self.ee_transformation_matrix = self.get_transformation(0, self.len_links)
+    self.ee_transformation_matrix = (
+      self.base_frame_transformation_offset
+      @ self.get_transformation(0, self.len_links)
+      @ self.ee_frame_transformation_offset
+    )
+
     self.jacobian = self.get_jacobian()
 
     self.lambdify_jacobian = sp.lambdify(
@@ -71,16 +83,16 @@ class ForwardKinematic:
     return self.ee_transformation_matrix
 
   def compute_jacobian(self, q):
-    return self.lambdify_jacobian(q + self.offset)
+    return self.lambdify_jacobian(q + self.joint_angle_offsets)
 
   def compute_ee_transformation_matrix(self, q):
-    return self.lambdify_ee_transformation_matrix(q + self.offset)
+    return self.lambdify_ee_transformation_matrix(q + self.joint_angle_offsets)
 
   def compute_ee_position(self, q):
-    return self.lambdify_ee_position(q + self.offset)
+    return self.lambdify_ee_position(q + self.joint_angle_offsets)
 
   def compute_ee_orientation(self, q):
-    return self.lambdify_ee_orientation(q + self.offset)
+    return self.lambdify_ee_orientation(q + self.joint_angle_offsets)
 
   def get_spacial_jacobian(self):
     return self.jacobian[:3, :]

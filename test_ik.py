@@ -26,7 +26,7 @@ print('Elapsed time:', end_time - start_time)
 print(' ')
 
 print(' ')
-print('Found thetas:', np.rad2deg(thetas + fk.offset))
+print('Found thetas:', np.rad2deg(thetas + fk.joint_angle_offsets))
 print('Success:', err)
 print(' ')
 
