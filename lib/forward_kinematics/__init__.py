@@ -9,13 +9,19 @@ class ForwardKinematic:
   def __init__(self,
                links,
                joint_angle_offsets=None,
-               ee_transformation_offset=np.eye(4)):
+               ee_transformation_offset=np.eye(4),
+               angles_signals_offset=None):
 
     self.links = links
     self.len_links = len(self.links)
 
     self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
     self.joint_angle_offsets = joint_angle_offsets
+
+    self.angles_signals_offset = angles_signals_offset
+
+    if angles_signals_offset is None:
+      self.angles_signals_offset = np.ones(self.len_links)
 
     if joint_angle_offsets is None:
       self.joint_angle_offsets = np.zeros(self.len_links)
@@ -67,6 +73,15 @@ class ForwardKinematic:
       self.ee_transformation_matrix[:3, :3],
       modules=['numpy'],
     )
+
+  def get_angles_with_offsets(self, q, angles_offset=False, angles_signal_offset=True):
+    if angles_offset:
+      q = q + self.joint_angle_offsets
+
+    if angles_signal_offset:
+      q = q * self.angles_signals_offset
+
+    return q
 
   def get_transformation(self, start, end):
     tf = compute_homogeneous_transformation(self.links, start, end)

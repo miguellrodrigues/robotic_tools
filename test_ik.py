@@ -7,7 +7,7 @@ from robots.comau import comau_fk as fk
 
 np.set_printoptions(suppress=True, precision=5)
 
-desired_transformation = np.array([892.07, 0, 1170, 0, -np.pi/8, np.pi/4])
+desired_transformation = np.array([892.07, 0, 1500, 0, 0, 0])
 
 start_time = time.time()
 
@@ -26,7 +26,7 @@ print('Elapsed time:', end_time - start_time)
 print(' ')
 
 print(' ')
-print('Found thetas:', np.rad2deg(thetas))
+print('Found thetas:', np.rad2deg(fk.get_angles_with_offsets(thetas)))
 print('Success:', err)
 print(' ')
 

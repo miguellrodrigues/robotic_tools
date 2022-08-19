@@ -23,10 +23,8 @@ def ik_position(
     [desired_position[2]]
   ])
 
-  n = fk.len_links
-
   if initial_guess is None:
-    initial_guess = np.array([.0 for _ in range(n)])
+    initial_guess = fk.joint_angle_offsets
 
   theta_i = initial_guess.copy()
 
