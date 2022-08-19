@@ -4,7 +4,7 @@ import numpy as np
 import sympy as sp
 
 from lib.forward_kinematics import ForwardKinematic
-from lib.frame import zyz
+# from lib.frame import zyz
 from lib.link import Link
 
 np.set_printoptions(suppress=True, precision=5)

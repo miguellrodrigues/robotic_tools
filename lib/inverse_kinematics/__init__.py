@@ -74,7 +74,7 @@ def ik(
     f_tolerance=epsilon_vb,
     max_iterations=max_iterations,
     lmbd=lmbd,
-    verbose=verbose
+    verbose=not verbose
   )
 
   if only_position:
