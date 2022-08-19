@@ -7,7 +7,7 @@ from robots.comau import comau_fk as fk
 
 np.set_printoptions(suppress=True, precision=5)
 
-desired_transformation = np.array([892.07, 0, 1500, 0, 0, 0])
+desired_transformation = np.array([585.961, -585.955, 250.974, 0, 0, 0])
 
 start_time = time.time()
 

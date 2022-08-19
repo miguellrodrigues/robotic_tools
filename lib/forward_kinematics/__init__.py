@@ -74,7 +74,7 @@ class ForwardKinematic:
       modules=['numpy'],
     )
 
-  def get_angles_with_offsets(self, q, angles_offset=False, angles_signal_offset=True):
+  def get_angles_with_offsets(self, q, angles_offset=True, angles_signal_offset=True):
     if angles_offset:
       q = q + self.joint_angle_offsets
 
