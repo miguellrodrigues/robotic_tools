@@ -9,15 +9,13 @@ class ForwardKinematic:
   def __init__(self,
                links,
                joint_angle_offsets=None,
-               base_frame_transformation_offset=np.eye(4),
-               ee_frame_transformation_offset=np.eye(4)):
+               ee_transformation_offset=np.eye(4)):
+
     self.links = links
     self.len_links = len(self.links)
+
     self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
     self.joint_angle_offsets = joint_angle_offsets
-
-    self.base_frame_transformation_offset = base_frame_transformation_offset
-    self.ee_frame_transformation_offset = ee_frame_transformation_offset
 
     if joint_angle_offsets is None:
       self.joint_angle_offsets = np.zeros(self.len_links)
@@ -43,12 +41,7 @@ class ForwardKinematic:
         inertia_tensor=I,
       )
 
-    self.ee_transformation_matrix = (
-      self.base_frame_transformation_offset
-      @ self.get_transformation(0, self.len_links)
-      @ self.ee_frame_transformation_offset
-    )
-
+    self.ee_transformation_matrix = self.get_transformation(0, self.len_links) @ ee_transformation_offset
     self.jacobian = self.get_jacobian()
 
     self.lambdify_jacobian = sp.lambdify(

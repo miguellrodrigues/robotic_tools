@@ -4,7 +4,7 @@ import numpy as np
 import sympy as sp
 
 from lib.forward_kinematics import ForwardKinematic
-from lib.frame import x_y_z_rotation_matrix, translation_matrix
+from lib.frame import x_y_z_rotation_matrix, translation_matrix, zyz
 from lib.utils import matrix_log6, inverse_transformation, se3_to_vec
 
 
@@ -66,7 +66,6 @@ def ik(
   verbose=False,
   only_position=False,
   normalize=False):
-
   # finding the thetas only for the position
   theta_pos, _, success_pos = ik_position(
     desired_position=desired_transformation[:3],
@@ -91,8 +90,8 @@ def ik(
   if initial_guess is None:
     initial_guess = theta_pos
 
-  desired_rotation = x_y_z_rotation_matrix(desired_transformation[3], desired_transformation[4],
-                                           desired_transformation[5])
+  desired_rotation = zyz(desired_transformation[3], desired_transformation[4],
+                         desired_transformation[5])
 
   desired_pose = sp.matrix2numpy(translation_matrix(desired_transformation[0], desired_transformation[1],
                                                     desired_transformation[2]) @ desired_rotation, dtype=np.float64)
