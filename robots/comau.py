@@ -20,7 +20,7 @@ j4 = Link([q5, 0, 0, sp.pi / 2])
 j5 = Link([q6, -95, 0, 0])
 
 home_angles_offset = np.array([
-  0, -np.pi/2, np.pi/2, 0, 0, 0
+  0, 0, 0, 0, 0, 0
 ], dtype=np.float64)
 
 angles_signals_offset = np.array([-1, 1, 1, 1, 1, 1])
@@ -30,17 +30,3 @@ comau_fk = ForwardKinematic(
   joint_angle_offsets=home_angles_offset,
   angles_signals_offset=angles_signals_offset
 )
-
-# 45 37 -125
-# t1 t2 t3 t5
-print(comau_fk.compute_ee_transformation_matrix(
-  np.deg2rad(
-    [-45, 29, -133, 0, 18, 0]  # -45, 29, 133, 0, 18, 0
-  )
-))
-#
-# print(
-#   sp.matrix2numpy(
-#     zyz(0, np.pi, np.pi/4)
-#   )
-# )
