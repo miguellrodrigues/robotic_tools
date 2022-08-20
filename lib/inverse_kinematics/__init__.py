@@ -86,7 +86,7 @@ def ik(
   # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
   if initial_guess is None:
-    initial_guess = theta_pos
+    initial_guess = np.zeros(6)
 
   desired_rotation = zyz(desired_transformation[3], desired_transformation[4],
                          desired_transformation[5])
