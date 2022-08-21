@@ -24,7 +24,7 @@ def ik_position(
   ])
 
   if initial_guess is None:
-    initial_guess = fk.joint_angle_offsets
+    initial_guess = np.random.randn(fk.len_links)
 
   theta_i = initial_guess.copy()
 
@@ -86,7 +86,7 @@ def ik(
   # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
   if initial_guess is None:
-    initial_guess = np.zeros(6)
+    initial_guess = np.zeros(fk.len_links)
 
   desired_rotation = zyz(desired_transformation[3], desired_transformation[4],
                          desired_transformation[5])

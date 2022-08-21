@@ -91,16 +91,16 @@ class ForwardKinematic:
     return self.ee_transformation_matrix
 
   def compute_jacobian(self, q):
-    return self.lambdify_jacobian(q + self.joint_angle_offsets)
+    return self.lambdify_jacobian(q)
 
   def compute_ee_transformation_matrix(self, q):
-    return self.lambdify_ee_transformation_matrix(q + self.joint_angle_offsets)
+    return self.lambdify_ee_transformation_matrix(q)
 
   def compute_ee_position(self, q):
-    return self.lambdify_ee_position(q + self.joint_angle_offsets)
+    return self.lambdify_ee_position(q)
 
   def compute_ee_orientation(self, q):
-    return self.lambdify_ee_orientation(q + self.joint_angle_offsets)
+    return self.lambdify_ee_orientation(q)
 
   def get_spacial_jacobian(self):
     return self.jacobian[:3, :]
