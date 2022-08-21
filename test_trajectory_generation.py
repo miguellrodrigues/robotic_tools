@@ -14,8 +14,6 @@ from robodk.robolink import *
 np.set_printoptions(suppress=True, precision=6)
 
 plt.style.use([
-  'science',
-  'notebook',
   'grid',
 ])
 
