@@ -1,13 +1,15 @@
 #  Copyright (c) Miguel L. Rodrigues 2022.
 
-import time
-
 import matplotlib.pyplot as plt
 import numpy as np
 
 from lib.inverse_kinematics import ik
 from lib.trajectory import Trajectory
 from robots.comau import comau_fk as fk
+from robodk.robolink import *
+
+# RDK = Robolink()
+# robot = RDK.Item('Comau Smart SiX 6-1.4')
 
 np.set_printoptions(suppress=True, precision=6)
 
@@ -20,7 +22,7 @@ plt.style.use([
 lmbd_start = .1
 lmbd_end = .1
 
-start_transformation = np.array([892.07, .0, 1170, 0, -np.pi / 6, np.pi / 4])
+start_transformation = np.array([892.07, .0, 1170, 0, 0, 0])
 desired_transformation = np.array([585.95, -585.95, 250.97, -np.pi / 4, 0, 0])
 
 start_time = time.time()
@@ -43,8 +45,8 @@ print(' ')
 print('Time elapsed:', end_time - start_time)
 print(' ')
 
-print(f'Start angles: {np.rad2deg(start_angles)}')
-print(f'End angles: {np.rad2deg(end_angles)}')
+print(f'Start angles: {np.rad2deg(fk.get_angles_to_real_robot(start_angles))}')
+print(f'End angles: {np.rad2deg(fk.get_angles_to_real_robot(end_angles))}')
 
 print(' ')
 print('Start transformation:\n', fk.compute_ee_transformation_matrix(start_angles))
@@ -52,13 +54,13 @@ print(' ')
 print('End transformation:\n', fk.compute_ee_transformation_matrix(end_angles))
 print(' ')
 
-start_velocity = np.zeros(6)
-start_acceleration = np.zeros(6)
+start_velocity = np.array([.0, .0, .0, .0, .0, .0])
+start_acceleration = np.array([.0, .0, .0, .0, .0, .0])
 
 end_velocity = np.array([.0, .0, .0, .0, .0, .0])
 end_acceleration = np.array([.0, .0, .0, .0, .0, .0])
 
-d_t = 5
+d_t = 10
 
 trajectories = np.empty(6, dtype=Trajectory)
 for i in range(len(start_angles)):
@@ -69,7 +71,7 @@ for i in range(len(start_angles)):
 start_time = 0
 end_time = d_t
 
-time_step = 1e-3
+time_step = 1e-2
 iterations = int((end_time - start_time) / time_step)
 time_values = np.linspace(start_time, end_time, iterations)
 
@@ -96,6 +98,12 @@ for t in range(len(trajectories)):
   trajectories_thetas[t, :] = t_thetas
   trajectories_velocities[t, :] = t_velocities
   trajectories_accelerations[t, :] = t_accelerations
+
+# for i in range(len(time_values)):
+#   ths = np.rad2deg(fk.get_angles_to_real_robot(trajectories_thetas[:, i]))
+#
+#   robot.setJoints(ths.tolist())
+#   print(time_values[i])
 
 fig, axs = plt.subplots(3, 1, figsize=(10, 10), tight_layout=True)
 
