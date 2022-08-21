@@ -65,18 +65,15 @@ def ik(
   only_position=False,
   normalize=False):
   # finding the thetas only for the position
-  theta_pos, _, success_pos = ik_position(
-    desired_position=desired_transformation[:3],
-    fk=fk,
-    initial_guess=initial_guess,
-    f_tolerance=epsilon_vb,
-    max_iterations=max_iterations,
-    lmbd=lmbd,
-    verbose=not verbose
-  )
-
   if only_position:
-    return theta_pos, _, success_pos
+    return ik_position(
+      desired_position=desired_transformation[:3],
+      fk=fk,
+      initial_guess=initial_guess,
+      f_tolerance=epsilon_vb,
+      max_iterations=max_iterations,
+      lmbd=lmbd,
+      verbose=not verbose)
 
   # transformation_data = [x, y, z, rx, ry, rz]
   # x, y, z: position of the end effector
@@ -126,8 +123,19 @@ def ik(
   # Use theta_i + fk.offset in external applications
   # For calculations using this lib, use theta_i with the offset
 
-  if error and success_pos:
-    theta_i = theta_pos
+  if error:
+    theta_pos, _, success_pos = ik_position(
+      desired_position=desired_transformation[:3],
+      fk=fk,
+      initial_guess=initial_guess,
+      f_tolerance=epsilon_vb,
+      max_iterations=max_iterations,
+      lmbd=lmbd,
+      verbose=not verbose
+    )
+
+    if success_pos:
+      theta_i = theta_pos
 
   if normalize:
     for i in range(len(theta_i)):

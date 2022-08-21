@@ -29,9 +29,3 @@ comau_fk = ForwardKinematic(
   joint_angle_offsets=home_angles_offset,
   angles_signals_offset=angles_signals_offset
 )
-
-print(comau_fk.compute_ee_transformation_matrix(
-  np.deg2rad(
-    [-45, 29, -133, 0, 18, 0]  # -45, 29, 133, 0, 18, 0
-  )
-))
