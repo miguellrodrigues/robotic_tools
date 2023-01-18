@@ -8,16 +8,16 @@ from robots.comau import comau_fk as fk
 np.set_printoptions(suppress=True, precision=5)
 
 # desired real robot position and orientation
-desired_transformation = np.array([-415.778, 863.661, 632.794, np.pi/4, 0, -np.pi/4])
+desired_transformation = np.array([-415.778, 863.661, 632.794, np.pi / 4, 0, -np.pi / 4])
 
 start_time = time.time()
 
 thetas, desired_pose, err = ik(
-  desired_transformation=desired_transformation,
-  fk=fk,
-  lmbd=.1,
-  only_position=False,
-  verbose=True
+    desired_transformation=desired_transformation,
+    fk=fk,
+    lmbd=.1,
+    only_position=False,
+    verbose=False
 )
 
 end_time = time.time()
