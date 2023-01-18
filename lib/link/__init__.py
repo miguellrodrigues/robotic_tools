@@ -1,4 +1,4 @@
-from lib.utils import compute_link_transformation
+from lib.utils import compute_link_transformation, np
 
 
 class Link:
@@ -9,12 +9,17 @@ class Link:
             mass=None,
             transformation_matrix=None,
             inertia_tensor=None,
+            limits=None,
             link_type='R'
     ):
         self.dhp = dhp
         self.generalized_coordinate = generalized_coordinate
         self.inertia_tensor = inertia_tensor
+        self.limits = limits
         self.link_type = link_type
+
+        if limits is None:
+            self.limits = [-np.pi, np.pi]
 
         if generalized_coordinate is None and dhp is None:
             raise ValueError('Either generalized_coordinate or dhp must be specified')

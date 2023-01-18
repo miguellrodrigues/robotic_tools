@@ -78,10 +78,10 @@ class ForwardKinematic:
         # return q with the offset to match the real robot
 
         if angles_offset:
-            q = q + self.joint_angle_offsets
+            q += self.joint_angle_offsets
 
         if angles_signal_offset:
-            q = q * self.angles_signals_offset
+            q *= self.angles_signals_offset
 
         return q
 

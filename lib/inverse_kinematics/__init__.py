@@ -5,7 +5,7 @@ import sympy as sp
 
 from lib.forward_kinematics import ForwardKinematic
 from lib.frame import x_y_z_rotation_matrix, translation_matrix
-from lib.utils import matrix_log6, inverse_transformation, se3_to_vec
+from lib.utils import matrix_log6, inverse_transformation, se3_to_vec, normalize_angle_between_limits
 
 
 def ik_position(
@@ -15,7 +15,8 @@ def ik_position(
         f_tolerance=1e-7,
         max_iterations=1500,
         lmbd=.1,
-        verbose=False
+        verbose=False,
+        normalize=False
 ):
     desired_position = np.array([
         [desired_position[0]],
@@ -24,7 +25,7 @@ def ik_position(
     ])
 
     if initial_guess is None:
-        initial_guess = np.random.randn(fk.len_links)
+        initial_guess = np.random.uniform(0, 2 * np.pi, fk.len_links)
 
     theta_i = initial_guess.copy()
 
@@ -50,6 +51,19 @@ def ik_position(
 
     # Use theta_i + fk.offset in external applications
     # For calculations using this lib, use theta_i with the offset
+
+    if normalize:
+        for i in range(fk.len_links):
+            link_limits = fk.links[i].limits
+
+            theta = normalize_angle_between_limits(
+                theta_i[i],
+                link_limits[0],
+                link_limits[1]
+            )
+
+            theta_i[i] = theta
+
     return theta_i, desired_position, not error
 
 
@@ -57,13 +71,13 @@ def ik(
         desired_transformation=None,
         fk: ForwardKinematic = None,
         initial_guess=None,
-        epsilon_wb=1e-7,
-        epsilon_vb=1e-7,
-        max_iterations=1500,
+        epsilon_wb=1e-5,
+        epsilon_vb=1e-5,
+        max_iterations=1000,
         lmbd=.1,
         verbose=False,
         only_position=False,
-        normalize=False):
+        normalize=True):
     # finding the thetas only for the position
     if only_position:
         return ik_position(
@@ -83,7 +97,7 @@ def ik(
     # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
     if initial_guess is None:
-        initial_guess = np.zeros(fk.len_links)
+        initial_guess = np.random.uniform(0, 2 * np.pi, fk.len_links)
 
     desired_rotation = x_y_z_rotation_matrix(desired_transformation[3], desired_transformation[4],
                                              desired_transformation[5])
@@ -100,8 +114,8 @@ def ik(
         htm = fk.compute_ee_transformation_matrix(theta_i)
         i_htm = inverse_transformation(htm)
 
-        Tbd = i_htm @ desired_pose
-        log_tbd = matrix_log6(Tbd)
+        T_bd = i_htm @ desired_pose
+        log_tbd = matrix_log6(T_bd)
 
         s = se3_to_vec(log_tbd)
 
@@ -138,7 +152,15 @@ def ik(
             theta_i = theta_pos
 
     if normalize:
-        for i in range(len(theta_i)):
-            theta_i[i] = theta_i[i] % (2 * np.pi)
+        for i in range(fk.len_links):
+            link_limits = fk.links[i].limits
+
+            theta = normalize_angle_between_limits(
+                theta_i[i],
+                link_limits[0],
+                link_limits[1]
+            )
+
+            theta_i[i] = theta
 
     return theta_i, desired_pose, 'Full' if not error else 'Partial' if success_pos else 'None'

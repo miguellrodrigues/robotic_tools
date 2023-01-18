@@ -17,7 +17,7 @@ thetas, desired_pose, err = ik(
     fk=fk,
     lmbd=.1,
     only_position=False,
-    verbose=False
+    verbose=False,
 )
 
 end_time = time.time()
@@ -27,11 +27,15 @@ print('Elapsed time:', end_time - start_time)
 print(' ')
 
 print(' ')
-print('Found thetas:', np.rad2deg(fk.get_angles_to_real_robot(thetas)))
+print('Found thetas:', np.rad2deg(thetas))
 print('Success:', err)
 print(' ')
 
 print('Desired pose:\n', desired_pose)
 print(' ')
-print('Found pose:\n', fk.compute_ee_transformation_matrix(thetas))
+
+ee_transformation_matrix = fk.compute_ee_transformation_matrix(thetas)
+
+print('Found pose:\n', ee_transformation_matrix)
 print(' ')
+print('Norm: ', np.linalg.norm(desired_pose - ee_transformation_matrix))

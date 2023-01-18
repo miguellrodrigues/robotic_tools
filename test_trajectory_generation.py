@@ -1,20 +1,19 @@
 #  Copyright (c) Miguel L. Rodrigues 2022.
 
+import time
+import scienceplots
 import matplotlib.pyplot as plt
 import numpy as np
-from robodk.robolink import *
 
 from lib.inverse_kinematics import ik
 from lib.trajectory import Trajectory
 from robots.comau import comau_fk as fk
 
-# RDK = Robolink()
-# robot = RDK.Item('Comau Smart SiX 6-1.4')
-
 np.set_printoptions(suppress=True, precision=6)
 
 plt.style.use([
     'grid',
+    'notebook',
 ])
 
 lmbd_start = .1
@@ -97,12 +96,6 @@ for t in range(len(trajectories)):
     trajectories_velocities[t, :] = t_velocities
     trajectories_accelerations[t, :] = t_accelerations
 
-# for i in range(len(time_values)):
-#   ths = np.rad2deg(fk.get_angles_to_real_robot(trajectories_thetas[:, i]))
-#
-#   robot.setJoints(ths.tolist())
-#   print(time_values[i])
-
 fig, axs = plt.subplots(3, 1, figsize=(10, 10), tight_layout=True)
 
 for i in range(len(trajectories_thetas)):
@@ -111,13 +104,13 @@ for i in range(len(trajectories_thetas)):
     ac_line, = axs[2].plot(time_values, trajectories_accelerations[i], color=colors[i])
 
 axs[0].set_xlabel('t (s)')
-axs[0].set_ylabel(r'$\theta(t)$')
+axs[0].set_ylabel('Angular Position')
 
 axs[1].set_xlabel('t (s)')
-axs[1].set_ylabel(r'$\dot{\theta(t)}$')
+axs[1].set_ylabel('Angular Velocity')
 
 axs[2].set_xlabel('t (s)')
-axs[2].set_ylabel(r'$\ddot{\theta(t)}$')
+axs[2].set_ylabel('Angular Acceleration')
 
 plt.savefig('images/trajectories.png', dpi=300)
 plt.show()
