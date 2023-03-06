@@ -16,26 +16,24 @@ class ForwardDynamics:
 
         self.w = self.jacobian[:3, :]
 
-        equations, D, C, G = self.get_system_equations_of_motion()
+        D, C, G, taus = self.get_system_equations_of_motion()
 
-        self.equations = equations
-        self.inertia_matrix = D
+        self.D = D
         self.C = C
         self.G = G
+        self.taus = taus
+
 
     def get_system_equations_of_motion(self):
-        equations = []
-        D, G = self.get_inertia_matrix_and_potential_energy()
+        D, P = self.get_inertia_matrix_and_potential_energy()
         C = sp.zeros(self.len_q, self.len_q)
+        G = P.diff(self.q)
+
+        taus = [sp.Symbol(f'tau_{i + 1}') for i in range(self.len_q)]
+        taus = sp.Matrix(taus)
 
         for k in range(len(self.links)):
             qk = self.q[k]
-            gk = G.diff(qk)
-
-            tau = sp.Symbol(f'tau_{k + 1}')
-
-            sum_a = 0
-            sum_b = 0
 
             for i in range(len(self.links)):
                 qi = self.q[i]
@@ -49,21 +47,13 @@ class ForwardDynamics:
                     dij = D[i, j]
 
                     cijk = sp.Rational(1, 2) * (dkj.diff(qi) + dki.diff(qj) - dij.diff(qk))
-
-                    sum_a += dkj * sp.diff(qj, t, 2)
-                    sum_b += cijk*self.dq_dt[i]*self.dq_dt[j]
-
                     ckj += cijk*self.dq_dt[j]
 
                 C[k, i] = ckj
 
-            tau_k = sum_a + sum_b + gk
+        taus = D@self.d2q_dt + C@self.dq_dt + G
 
-            equations.append(
-                sp.Eq(tau, tau_k)
-            )
-
-        return equations, D, C, G
+        return D, C, G, taus
 
     def get_inertia_matrix_and_potential_energy(self):
         # translational_kinetic_energy = 0
