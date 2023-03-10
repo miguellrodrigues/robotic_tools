@@ -13,7 +13,7 @@ def de_ik(
         desired_transformation=None,
         fk: ForwardKinematic = None,
         initial_guess=None,
-        max_iterations=1000,
+        max_iterations=500,
         verbose=False,
 ):
     if initial_guess is None:
@@ -25,11 +25,6 @@ def de_ik(
     desired_pose = sp.matrix2numpy(translation_matrix(desired_transformation[0], desired_transformation[1],
                                                       desired_transformation[2]) @ desired_rotation, dtype=np.float64)
 
-    theta_i = initial_guess.copy()
-
-    error = True
-    i = 0
-
     def cost_function(thetas):
         htm = fk.compute_ee_transformation_matrix(thetas)
         i_htm = inverse_transformation(htm)
@@ -39,21 +34,28 @@ def de_ik(
 
         s = se3_to_vec(log_tbd)
         n_s = np.linalg.norm(s)
-
-        if verbose:
-            print(f'Iteration {i}, error = {n_s}')
-
-        return n_s
+        
+        return n_s  # np.linalg.norm(desired_pose - htm)
 
     bounds = [(link.limits[0], link.limits[1]) for link in fk.links]
 
-    res = differential_evolution(cost_function, bounds, maxiter=max_iterations)
-
-    if res.success:
-        theta_i = res.x
-        error = False
+    res = differential_evolution(
+        cost_function, 
+        bounds, 
+        maxiter=max_iterations, 
+        popsize=12, 
+        mutation=(.2, 1),
+        recombination=.7, 
+        vectorized=False,
+        updating='immediate',
+        disp=verbose,
+    )
     
-    return theta_i, desired_pose, not error
+    print(res.success)
+
+    theta_i = res.x
+    
+    return theta_i, desired_pose
 
 
 def ik_position(

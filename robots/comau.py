@@ -12,13 +12,6 @@ np.set_printoptions(suppress=True, precision=5)
 
 q1, q2, q3, q4, q5, q6 = sp.symbols('q_1 q_2 q_3 q_4 q_5 q_6')
 
-q1 = sp.Function('q_1')(t)
-q2 = sp.Function('q_2')(t)
-q3 = sp.Function('q_3')(t)
-q4 = sp.Function('q_4')(t)
-q5 = sp.Function('q_5')(t)
-q6 = sp.Function('q_6')(t)
-
 joint_limits = np.deg2rad(
     np.array([
         [-170, 170],
@@ -45,6 +38,6 @@ tcp_angles_signals_offset = np.array([-1, 1, 1, 1, 1, 1])
 
 comau_fk = ForwardKinematic(
     [j0, j1, j2, j3, j4, j5],
-    joint_angle_offsets=tcp_angles_offset,
-    angles_signals_offset=tcp_angles_signals_offset
+    # joint_angle_offsets=tcp_angles_offset,
+    # angles_signals_offset=tcp_angles_signals_offset
 )
