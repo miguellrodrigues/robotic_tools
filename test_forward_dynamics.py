@@ -5,9 +5,18 @@ from robots.comau import comau_fk as fk
 fd = ForwardDynamics(fk)
 i = 0
 
-for eq in fd.equations:
-    simplified = sp.simplify(eq)
+print(1)
 
-    print(' ')
-    sp.pprint(simplified.args)
-    print(' ')
+D, C, G = fd.D, fd.C, fd.G
+
+matrices = [D,C,G]
+names    = ['D', 'C', 'G']
+
+for mat in matrices:
+    mat = sp.simplify(mat)
+
+    with open(f'comau_{names[i]}.txt', 'w') as f:
+        f.write(sp.latex(mat))
+    
+    i += 1
+

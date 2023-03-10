@@ -6,10 +6,18 @@ import sympy as sp
 from lib.forward_kinematics import ForwardKinematic
 # from lib.frame import zyz
 from lib.link import Link
+from lib.symbols import t
 
 np.set_printoptions(suppress=True, precision=5)
 
 q1, q2, q3, q4, q5, q6 = sp.symbols('q_1 q_2 q_3 q_4 q_5 q_6')
+
+q1 = sp.Function('q_1')(t)
+q2 = sp.Function('q_2')(t)
+q3 = sp.Function('q_3')(t)
+q4 = sp.Function('q_4')(t)
+q5 = sp.Function('q_5')(t)
+q6 = sp.Function('q_6')(t)
 
 joint_limits = np.deg2rad(
     np.array([

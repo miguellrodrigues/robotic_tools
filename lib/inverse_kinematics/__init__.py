@@ -6,6 +6,54 @@ import sympy as sp
 from lib.forward_kinematics import ForwardKinematic
 from lib.frame import x_y_z_rotation_matrix, translation_matrix
 from lib.utils import matrix_log6, inverse_transformation, se3_to_vec, normalize_angle_between_limits
+from scipy.optimize import differential_evolution
+
+
+def de_ik(
+        desired_transformation=None,
+        fk: ForwardKinematic = None,
+        initial_guess=None,
+        max_iterations=1000,
+        verbose=False,
+):
+    if initial_guess is None:
+        initial_guess = np.random.uniform(0, 2 * np.pi, fk.len_links)
+
+    desired_rotation = x_y_z_rotation_matrix(desired_transformation[3], desired_transformation[4],
+                                             desired_transformation[5])
+
+    desired_pose = sp.matrix2numpy(translation_matrix(desired_transformation[0], desired_transformation[1],
+                                                      desired_transformation[2]) @ desired_rotation, dtype=np.float64)
+
+    theta_i = initial_guess.copy()
+
+    error = True
+    i = 0
+
+    def cost_function(thetas):
+        htm = fk.compute_ee_transformation_matrix(thetas)
+        i_htm = inverse_transformation(htm)
+
+        T_bd = i_htm @ desired_pose
+        log_tbd = matrix_log6(T_bd)
+
+        s = se3_to_vec(log_tbd)
+        n_s = np.linalg.norm(s)
+
+        if verbose:
+            print(f'Iteration {i}, error = {n_s}')
+
+        return n_s
+
+    bounds = [(link.limits[0], link.limits[1]) for link in fk.links]
+
+    res = differential_evolution(cost_function, bounds, maxiter=max_iterations)
+
+    if res.success:
+        theta_i = res.x
+        error = False
+    
+    return theta_i, desired_pose, not error
 
 
 def ik_position(
