@@ -75,7 +75,7 @@ def ik_position(
     ])
 
     if initial_guess is None:
-        initial_guess = np.random.uniform(0, 2 * np.pi, fk.len_links)
+        initial_guess = np.random.uniform(-np.pi, np.pi, fk.len_links)
 
     theta_i = initial_guess.copy()
 
@@ -206,7 +206,7 @@ def ik(
                 verbose=verbose
             )
 
-    if normalize:
+    if normalize and not success_de:
         for i in range(fk.len_links):
             link_limits = fk.links[i].limits
 
