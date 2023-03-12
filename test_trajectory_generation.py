@@ -1,5 +1,3 @@
-#  Copyright (c) Miguel L. Rodrigues 2022.
-
 import time
 import scienceplots
 import matplotlib.pyplot as plt
