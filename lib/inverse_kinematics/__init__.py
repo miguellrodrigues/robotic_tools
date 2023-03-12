@@ -43,7 +43,7 @@ def evolutive_ik(
     res = cma.fmin(
         cost_function,
         x0=initial_guess,
-        sigma0=.25,
+        sigma0=.5,
         options={
             'tolfun'   : 1e-6,
             'maxfevals': 10*max_iterations,
@@ -186,6 +186,8 @@ def ik(
 
     # Use theta_i + fk.offset in external applications
     # For calculations using this lib, use theta_i with the offset
+
+    success_de = False
 
     if error:
         theta_i, desired_pose, success_de = evolutive_ik(
