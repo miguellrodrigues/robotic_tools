@@ -45,9 +45,10 @@ def evolutive_ik(
         x0=initial_guess,
         sigma0=.25,
         options={
-            'tolfun': 1e-6,  # set the desired tolerance on the function value
-            'maxfevals': 10*max_iterations,  # set the maximum number of function evaluations
-            'verb_disp': verbose,  # enable/disable verbose output
+            'tolfun'   : 1e-6,
+            'maxfevals': 10*max_iterations,
+            'verb_log' : 0,
+            'verb_disp': verbose,
         }
     )
 
