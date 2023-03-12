@@ -1,5 +1,3 @@
-#  Copyright (c) Miguel L. Rodrigues 2022.
-
 import numpy as np
 import sympy as sp
 import cma
