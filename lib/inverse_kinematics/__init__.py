@@ -2,22 +2,24 @@
 
 import numpy as np
 import sympy as sp
+import cma
+
 
 from lib.forward_kinematics import ForwardKinematic
 from lib.frame import x_y_z_rotation_matrix, translation_matrix
 from lib.utils import matrix_log6, inverse_transformation, se3_to_vec, normalize_angle_between_limits
-from scipy.optimize import differential_evolution
 
 
-def de_ik(
+# CMA-ES (Covariance Matrix Adaptation Evolution Strategy) 
+def evolutive_ik(
         desired_transformation=None,
         fk: ForwardKinematic = None,
         initial_guess=None,
-        max_iterations=500,
+        max_iterations=1000,
         verbose=False,
 ):
     if initial_guess is None:
-        initial_guess = np.random.uniform(0, 2 * np.pi, fk.len_links)
+        initial_guess = np.random.rand(6)
 
     desired_rotation = x_y_z_rotation_matrix(desired_transformation[3], desired_transformation[4],
                                              desired_transformation[5])
@@ -34,28 +36,25 @@ def de_ik(
 
         s = se3_to_vec(log_tbd)
         n_s = np.linalg.norm(s)
-        
-        return n_s  # np.linalg.norm(desired_pose - htm)
 
-    bounds = [(link.limits[0], link.limits[1]) for link in fk.links]
+        return n_s
 
-    res = differential_evolution(
-        cost_function, 
-        bounds, 
-        maxiter=max_iterations, 
-        popsize=12, 
-        mutation=(.2, 1),
-        recombination=.7, 
-        vectorized=False,
-        updating='immediate',
-        disp=verbose,
+
+    res = cma.fmin(
+        cost_function,
+        x0=initial_guess,
+        sigma0=.25,
+        options={
+            'tolfun': 1e-6,  # set the desired tolerance on the function value
+            'maxfevals': 10*max_iterations,  # set the maximum number of function evaluations
+            'verb_disp': verbose,  # enable/disable verbose output
+        }
     )
-    
-    print(res.success)
 
-    theta_i = res.x
-    
-    return theta_i, desired_pose
+    theta_i = res[0]
+    success = res[1] <= 1e-6
+
+    return theta_i, desired_pose, success
 
 
 def ik_position(
@@ -147,7 +146,7 @@ def ik(
     # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
     if initial_guess is None:
-        initial_guess = np.random.uniform(0, 2 * np.pi, fk.len_links)
+        initial_guess = np.random.uniform(-np.pi, np.pi, fk.len_links)
 
     desired_rotation = x_y_z_rotation_matrix(desired_transformation[3], desired_transformation[4],
                                              desired_transformation[5])
@@ -188,18 +187,23 @@ def ik(
     # For calculations using this lib, use theta_i with the offset
 
     if error:
-        theta_pos, _, success_pos = ik_position(
-            desired_position=desired_transformation[:3],
+        theta_i, desired_pose, success_de = evolutive_ik(
+            desired_transformation=desired_transformation,
             fk=fk,
             initial_guess=initial_guess,
-            f_tolerance=epsilon_vb,
             max_iterations=max_iterations,
-            lmbd=lmbd,
-            verbose=not verbose
+            verbose=verbose,
         )
 
-        if success_pos:
-            theta_i = theta_pos
+        if not success_de:
+            theta_i, desired_pose, success_pose = ik_position(
+                desired_position=desired_transformation[:3],
+                fk=fk,
+                f_tolerance=epsilon_vb,
+                max_iterations=max_iterations,
+                lmbd=lmbd,
+                verbose=verbose
+            )
 
     if normalize:
         for i in range(fk.len_links):
@@ -213,4 +217,4 @@ def ik(
 
             theta_i[i] = theta
 
-    return theta_i, desired_pose, 'Full' if not error else 'Partial' if success_pos else 'None'
+    return theta_i, desired_pose, 'Full' if not error else 'Full - Evolutive' if success_de else 'Only Position' if success_pose else 'Failed'

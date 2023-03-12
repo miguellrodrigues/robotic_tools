@@ -15,9 +15,10 @@ start_time = time.time()
 thetas, desired_pose, err = ik(
     desired_transformation=desired_transformation,
     fk=fk,
-    lmbd=.1,
+    lmbd=1,
     only_position=False,
     verbose=False,
+    max_iterations=1000
 )
 
 end_time = time.time()

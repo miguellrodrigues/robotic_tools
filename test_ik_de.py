@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 
-from lib.inverse_kinematics import de_ik
+from lib.inverse_kinematics import *
 from robots.comau import comau_fk as fk
 
 np.set_printoptions(suppress=True, precision=5)
@@ -12,10 +12,10 @@ desired_transformation = np.array([-415.778, 863.661, 632.794, -np.sqrt(3)/2, -n
 
 start_time = time.time()
 
-thetas, desired_pose = de_ik(
+thetas, desired_pose, success = evolutive_ik(
     desired_transformation=desired_transformation,
     fk=fk,
-    verbose=True,
+    verbose=False,
 )
 
 end_time = time.time()
