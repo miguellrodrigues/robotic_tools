@@ -8,7 +8,7 @@ from robots.comau import comau_fk as fk
 np.set_printoptions(suppress=True, precision=6)
 
 # desired real robot position and orientation
-desired_transformation = np.array([-415.778, 263.661, 632.794, -np.sqrt(5)/2, np.pi/12, -2*np.pi/4])
+desired_transformation = np.array([-415.778, 263.661, 632.794, np.sqrt(5)/2, np.pi/3, -np.pi/4])
 
 start_time = time.time()
 

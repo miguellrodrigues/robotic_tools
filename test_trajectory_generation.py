@@ -19,22 +19,13 @@ plt.style.use([
 lmbd_start = .1
 lmbd_end = .1
 
-start_transformation = np.array([892.07, .0, 1170, 0, 0, 0])
-desired_transformation = np.array([585.95, -585.95, 250.97, -np.pi / 4, 0, 0])
+start_transformation   = np.array([-415.778, 263.661, 632.794, np.sqrt(5)/2, np.pi/3, -np.pi/4])
+desired_transformation = np.array([585.95, -585.95, 250.97, -np.pi / 4, -np.pi/3, np.pi/4])
 
 start_time = time.time()
 
 start_angles, _, ss = ik(desired_transformation=start_transformation, fk=fk)
 end_angles, _, se = ik(desired_transformation=desired_transformation, fk=fk)
-
-while not (ss and se):
-    if not ss:
-        lmbd_start -= .1
-        start_angles, ss = ik(start_transformation, lmbd=lmbd_start, fk=fk)
-
-    if not se:
-        lmbd_end -= .1
-        end_angles, se = ik(desired_transformation, lmbd=lmbd_end, fk=fk)
 
 end_time = time.time()
 
@@ -57,7 +48,7 @@ start_acceleration = np.array([.0, .0, .0, .0, .0, .0])
 end_velocity = np.array([.0, .0, .0, .0, .0, .0])
 end_acceleration = np.array([.0, .0, .0, .0, .0, .0])
 
-d_t = 10
+d_t = 1
 
 trajectories = np.empty(6, dtype=Trajectory)
 for i in range(len(start_angles)):

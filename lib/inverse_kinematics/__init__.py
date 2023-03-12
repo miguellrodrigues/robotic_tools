@@ -39,6 +39,8 @@ def evolutive_ik(
 
         return n_s
 
+    lower_bounds = [fk.links[i].limits[0] for i in range(fk.len_links)]
+    upper_bounds = [fk.links[i].limits[1] for i in range(fk.len_links)]
 
     res = cma.fmin(
         cost_function,
@@ -49,6 +51,7 @@ def evolutive_ik(
             'maxfevals': 10*max_iterations,
             'verb_log' : 0,
             'verb_disp': verbose,
+            'bounds'   : [lower_bounds, upper_bounds]
         }
     )
 
@@ -75,7 +78,7 @@ def ik_position(
     ])
 
     if initial_guess is None:
-        initial_guess = np.random.uniform(-np.pi, np.pi, fk.len_links)
+        initial_guess = np.random.rand(6)
 
     theta_i = initial_guess.copy()
 
@@ -147,7 +150,7 @@ def ik(
     # The end effector z-axis must be in the same direction and sign as the z-axis of the base frame z-axis
 
     if initial_guess is None:
-        initial_guess = np.random.uniform(-np.pi, np.pi, fk.len_links)
+        initial_guess = initial_guess = np.random.rand(6)
 
     desired_rotation = x_y_z_rotation_matrix(desired_transformation[3], desired_transformation[4],
                                              desired_transformation[5])
