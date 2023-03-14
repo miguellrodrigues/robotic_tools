@@ -43,18 +43,30 @@ def evolutive_ik(
     res = cma.fmin(
         cost_function,
         x0=initial_guess,
-        sigma0=.5,
+        sigma0=.25,
+        restarts=5,
+        incpopsize=4,
         options={
             'tolfun'   : 1e-6,
             'maxfevals': 10*max_iterations,
             'verb_log' : 0,
             'verb_disp': verbose,
-            'bounds'   : [lower_bounds, upper_bounds]
+            'bounds'   : [lower_bounds, upper_bounds],
+            'CMA_diagonal': 100
         }
     )
 
     theta_i = res[0]
     success = res[1] <= 1e-6
+
+    if not success:
+        theta_i, desired_pose, success = evolutive_ik(
+            desired_transformation,
+            fk,
+            initial_guess,
+            max_iterations,
+            verbose,
+        )
 
     return theta_i, desired_pose, success
 
