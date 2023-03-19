@@ -1,20 +1,62 @@
 import numpy as np
 import sympy as sp
-import cma
 
+from pymoo.core.problem import Problem
+from pymoo.optimize import minimize
+from pymoo.termination.default import MaximumGenerationTermination
 
 from lib.forward_kinematics import ForwardKinematic
 from lib.frame import x_y_z_rotation_matrix, translation_matrix
 from lib.utils import matrix_log6, inverse_transformation, se3_to_vec, normalize_angle_between_limits
 
 
-# CMA-ES (Covariance Matrix Adaptation Evolution Strategy) 
+class InverseKinematicProblem(Problem):
+    def __init__(
+            self,
+            desired_pose=None,
+            fk: ForwardKinematic = None,
+            n_var=6,
+            n_obj=1,
+    ):
+        lb = [fk.links[i].limits[0] for i in range(fk.len_links)]
+        ub = [fk.links[i].limits[1] for i in range(fk.len_links)]
+
+        super().__init__(n_var=n_var, n_obj=n_obj, n_constr=0, xl=lb, xu=ub)
+
+        self.desired_pose = desired_pose
+        self.fk = fk
+    
+    def _evaluate(self, X, out, *args, **kwargs):
+        iters = X.shape[0]
+        F = np.zeros((iters, 1))
+
+        fk = self.fk
+        desired_pose = self.desired_pose
+
+        for i in range(iters):
+            Q = X[i, :]
+
+            htm = fk.compute_ee_transformation_matrix(Q)
+            i_htm = inverse_transformation(htm)
+
+            T_bd = i_htm @ desired_pose
+            log_tbd = matrix_log6(T_bd)
+
+            s = se3_to_vec(log_tbd)
+            n_s = np.linalg.norm(s)
+
+            F[i] = n_s
+        
+        out["F"] = F
+
+
 def evolutive_ik(
         desired_transformation=None,
         fk: ForwardKinematic = None,
         initial_guess=None,
-        max_iterations=1000,
+        max_iterations=1024,
         verbose=False,
+        algorithm=None,
 ):
     if initial_guess is None:
         initial_guess = np.random.rand(6)
@@ -25,47 +67,41 @@ def evolutive_ik(
     desired_pose = sp.matrix2numpy(translation_matrix(desired_transformation[0], desired_transformation[1],
                                                       desired_transformation[2]) @ desired_rotation, dtype=np.float64)
 
-    def cost_function(thetas):
-        htm = fk.compute_ee_transformation_matrix(thetas)
-        i_htm = inverse_transformation(htm)
-
-        T_bd = i_htm @ desired_pose
-        log_tbd = matrix_log6(T_bd)
-
-        s = se3_to_vec(log_tbd)
-        n_s = np.linalg.norm(s)
-
-        return n_s
-
-    lower_bounds = [fk.links[i].limits[0] for i in range(fk.len_links)]
-    upper_bounds = [fk.links[i].limits[1] for i in range(fk.len_links)]
-
-    res = cma.fmin(
-        cost_function,
-        x0=initial_guess,
-        sigma0=.25,
-        restarts=5,
-        incpopsize=4,
-        options={
-            'tolfun'   : 1e-6,
-            'maxfevals': 10*max_iterations,
-            'verb_log' : 0,
-            'verb_disp': verbose,
-            'bounds'   : [lower_bounds, upper_bounds],
-            'CMA_diagonal': 100
-        }
+    termination = MaximumGenerationTermination(
+        n_max_gen=max_iterations
     )
 
-    theta_i = res[0]
-    success = res[1] <= 1e-6
+    problem = InverseKinematicProblem(
+        desired_pose=desired_pose,
+        fk=fk,
+    )
+
+    if algorithm is None:
+        from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
+
+        algorithm = CMAES(
+            sigma=.5,
+        )
+
+    res = minimize(
+        problem,
+        algorithm,
+        termination,
+        verbose=verbose,
+        save_history=False,
+    )
+
+    theta_i = res.X
+    success = res.F.min() < 1e-7
 
     if not success:
-        theta_i, desired_pose, success = evolutive_ik(
-            desired_transformation,
-            fk,
-            initial_guess,
-            max_iterations,
-            verbose,
+        theta_i, _, success = evolutive_ik(
+            desired_transformation=desired_transformation,
+            fk=fk,
+            initial_guess=initial_guess,
+            max_iterations=max_iterations,
+            verbose=verbose,
+            algorithm=algorithm,
         )
 
     return theta_i, desired_pose, success
