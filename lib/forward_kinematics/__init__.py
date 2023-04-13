@@ -8,23 +8,12 @@ from lib.utils import compute_homogeneous_transformation
 class ForwardKinematic:
     def __init__(self,
                  links,
-                 joint_angle_offsets=None,
-                 ee_transformation_offset=np.eye(4),
-                 angles_signals_offset=None):
+        ):
 
         self.links = links
         self.len_links = len(self.links)
 
         self.generalized_coordinates = [self.links[i].generalized_coordinate for i in range(self.len_links)]
-        self.joint_angle_offsets = joint_angle_offsets
-
-        self.angles_signals_offset = angles_signals_offset
-
-        if angles_signals_offset is None:
-            self.angles_signals_offset = np.ones(self.len_links)
-
-        if joint_angle_offsets is None:
-            self.joint_angle_offsets = np.zeros(self.len_links)
 
         self.links_zero_i = np.empty(self.len_links, dtype=Link)
 
@@ -47,7 +36,7 @@ class ForwardKinematic:
                 inertia_tensor=I,
             )
 
-        self.ee_transformation_matrix = self.get_transformation(0, self.len_links) @ ee_transformation_offset
+        self.ee_transformation_matrix = self.get_transformation(0, self.len_links)
         self.jacobian = self.get_jacobian()
 
         self.lambdify_jacobian = sp.lambdify(

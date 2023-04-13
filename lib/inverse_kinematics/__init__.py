@@ -94,16 +94,6 @@ def evolutive_ik(
     theta_i = res.X
     success = res.F.min() < 1e-7
 
-    if not success:
-        theta_i, _, success = evolutive_ik(
-            desired_transformation=desired_transformation,
-            fk=fk,
-            initial_guess=initial_guess,
-            max_iterations=max_iterations,
-            verbose=verbose,
-            algorithm=algorithm,
-        )
-
     return theta_i, desired_pose, success
 
 
