@@ -25,4 +25,3 @@ j5 = Link([q6, d6+d5,      0,             0])
 generic_fk = ForwardKinematic(
     [j0, j1, j2, j3, j4, j5],
 )
-

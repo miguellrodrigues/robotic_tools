@@ -4,7 +4,6 @@ import numpy as np
 import sympy as sp
 
 from lib.forward_kinematics import ForwardKinematic
-# from lib.frame import zyz
 from lib.link import Link
 from lib.symbols import t
 
@@ -16,7 +15,7 @@ joint_limits = np.deg2rad(
     np.array([
         [-170, 170],
         [-85, 155],
-        [-85, 85],
+        [0, 170],
         [-210, 210],
         [-130, 130],
         [-270, 270]
@@ -24,20 +23,12 @@ joint_limits = np.deg2rad(
 )
 
 j0 = Link([q1, 450, 150, -sp.pi / 2], limits=joint_limits[0])
-j1 = Link([q2, 0, 590, sp.pi], limits=joint_limits[1])
-j2 = Link([q3, 0, 130, -sp.pi / 2], limits=joint_limits[2])
+j1 = Link([q2, 0, 590, sp.pi], limits=joint_limits[1], offset=sp.pi/2)
+j2 = Link([q3, 0, 130, -sp.pi / 2], limits=joint_limits[2], offset=-sp.pi/2)
 j3 = Link([q4, -647.07, 0, -sp.pi / 2], limits=joint_limits[3])
 j4 = Link([q5, 0, 0, sp.pi / 2], limits=joint_limits[4])
 j5 = Link([q6, -95, 0, 0], limits=joint_limits[5])
 
-tcp_angles_offset = np.array([
-    0, np.pi / 2, -np.pi / 2, 0, 0, 0
-], dtype=np.float64)
-
-tcp_angles_signals_offset = np.array([-1, 1, 1, 1, 1, 1])
-
 comau_fk = ForwardKinematic(
     [j0, j1, j2, j3, j4, j5],
-    # joint_angle_offsets=tcp_angles_offset,
-    # angles_signals_offset=tcp_angles_signals_offset
 )

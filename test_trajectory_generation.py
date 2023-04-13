@@ -31,8 +31,8 @@ print(' ')
 print('Time elapsed:', end_time - start_time)
 print(' ')
 
-print(f'Start angles: {np.rad2deg(fk.get_angles_to_real_robot(start_angles))}')
-print(f'End angles: {np.rad2deg(fk.get_angles_to_real_robot(end_angles))}')
+print(f'Start angles: {np.rad2deg(start_angles)}')
+print(f'End angles: {np.rad2deg(end_angles)}')
 
 print(' ')
 print('Start transformation:\n', fk.compute_ee_transformation_matrix(start_angles))

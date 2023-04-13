@@ -63,22 +63,6 @@ class ForwardKinematic:
             modules=['numpy'],
         )
 
-    def get_angles_to_real_robot(self, q, angles_offset=True, angles_signal_offset=True):
-        # return q with the offset to match the real robot
-
-        if angles_offset:
-            q += self.joint_angle_offsets
-
-        if angles_signal_offset:
-            q *= self.angles_signals_offset
-
-        return q
-
-    def get_angles_from_real_robot(self, q):
-        # return q without the offset to match the 'virtual' robot
-
-        return self.angles_signals_offset * q - self.joint_angle_offsets
-
     def get_transformation(self, start, end):
         tf = compute_homogeneous_transformation(self.links, start, end)
         return tf

@@ -54,7 +54,7 @@ def evolutive_ik(
         desired_transformation=None,
         fk: ForwardKinematic = None,
         initial_guess=None,
-        max_iterations=1024,
+        max_iterations=2048,
         verbose=False,
         algorithm=None,
 ):
@@ -80,7 +80,11 @@ def evolutive_ik(
         from pymoo.algorithms.soo.nonconvex.cmaes import CMAES
 
         algorithm = CMAES(
-            sigma=.5,
+            restarts=2,
+            bipop=True,
+            sigma=1,
+            tolfun=1e-8,
+            tolx=1e-8
         )
 
     res = minimize(
