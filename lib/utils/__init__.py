@@ -131,11 +131,17 @@ def matrix_log6(T):
             p)], [[0, 0, 0, 0]]]
 
 
-def compute_link_transformation(dhp):
+def compute_link_transformation(dhp, offset=0, link_type='R'):
     rz = z_rotation_matrix(dhp[0])
     tz = translation_matrix(0, 0, dhp[1])
     tx = translation_matrix(dhp[2], 0, 0)
     rx = x_rotation_matrix(dhp[3])
+
+    if offset != 0:
+        if link_type == 'R':
+            rz @= z_rotation_matrix(offset)
+        else:
+            tz @= translation_matrix(0, 0, offset)
 
     return rz @ tz @ tx @ rx
 

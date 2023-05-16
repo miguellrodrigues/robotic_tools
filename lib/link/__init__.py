@@ -37,11 +37,6 @@ class Link:
             elif link_type == 'P':
                 self.generalized_coordinate = dhp[1]
 
-        if link_type == 'R':
-            self.dhp[0] += offset
-        else:
-            self.dhp[1] += offset
-
         self.mass = mass
         self.transformation_matrix = transformation_matrix
 
@@ -49,7 +44,7 @@ class Link:
             self.transformation_matrix = compute_link_transformation(dhp)
 
     def update(self):
-        self.transformation_matrix = compute_link_transformation(self.dhp)
+        self.transformation_matrix = compute_link_transformation(self.dhp, self.offset)
 
     def get_transformation_matrix(self):
         return self.transformation_matrix

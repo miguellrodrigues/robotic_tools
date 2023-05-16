@@ -8,14 +8,14 @@ from robots.comau import comau_fk as fk
 np.set_printoptions(suppress=True, precision=6)
 
 # desired real robot position and orientation
-desired_transformation = np.array([-415.778, 263.661, 632.794, 1, 2, 3])
+desired_transformation = np.array([498.428, -1008.259, 655.078, 0, 0, 0])
 
 start_time = time.time()
 
 thetas, desired_pose, success = evolutive_ik(
     desired_transformation=desired_transformation,
     fk=fk,
-    verbose=False,
+    verbose=True,
 )
 
 end_time = time.time()
